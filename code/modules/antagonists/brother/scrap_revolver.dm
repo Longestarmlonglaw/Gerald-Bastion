@@ -24,6 +24,12 @@
 		stored_ammo += null
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap
+	bb_weapon_family = BB_GUN_BALLISTIC
+	bb_part_slots = list(
+		BB_GUN_PART_MAGAZINE,
+		BB_GUN_PART_FIRING_MECHANISM,
+		BB_GUN_PART_BARREL,
+	)
 	name = "scrap revolver"
 	desc = "A crude revolver cobbled together from whatever parts were available. Its matter-bin cylinder can be configured for .38 rounds or 12 gauge shells."
 	icon_state = "c38"
