@@ -155,7 +155,7 @@
 	for(var/slot in bb_part_slots)
 		var/obj/item/part = bb_installed_parts[slot]
 		if(part)
-			available_parts[slot] = part.name
+			available_parts["[part.name] ([slot])"] = slot
 
 	if(!available_parts.len)
 		balloon_alert(user, "no upgrade parts installed!")
