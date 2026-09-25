@@ -15,6 +15,14 @@
 
 	var/shotgun_mode = FALSE
 
+/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/Initialize(mapload)
+	. = ..()
+	// Cylinders need one slot per chamber so the cylinder-specific give_round()
+	// proc has empty chambers to place ammunition into.
+	stored_ammo = list()
+	for(var/i in 1 to max_ammo)
+		stored_ammo += null
+
 /obj/item/gun/ballistic/revolver/blood_brother_scrap
 	name = "scrap revolver"
 	desc = "A crude revolver cobbled together from whatever parts were available. Its matter-bin cylinder can be configured for .38 rounds or 12 gauge shells."
@@ -66,13 +74,16 @@
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
 		cylinder.max_ammo = 3
-		// A mode switch is only possible with no live rounds, so any excess
-		// casings here are spent and can be dumped when reducing capacity.
-		while(cylinder.stored_ammo.len > cylinder.max_ammo)
-			var/obj/item/ammo_casing/spent_casing = cylinder.stored_ammo[cylinder.stored_ammo.len]
-			cylinder.stored_ammo.len--
-			if(spent_casing)
-				spent_casing.forceMove(drop_location())
+
+	// A mode switch is only possible with no live rounds. Keep the cylinder's
+	// chamber slots in sync with its current capacity and dump excess casings.
+	while(cylinder.stored_ammo.len > cylinder.max_ammo)
+		var/obj/item/ammo_casing/excess_casing = cylinder.stored_ammo[cylinder.stored_ammo.len]
+		cylinder.stored_ammo.len--
+		if(excess_casing)
+			excess_casing.forceMove(drop_location())
+	while(cylinder.stored_ammo.len < cylinder.max_ammo)
+		cylinder.stored_ammo += null
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
