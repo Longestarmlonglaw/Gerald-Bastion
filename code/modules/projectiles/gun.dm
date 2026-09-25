@@ -89,12 +89,13 @@
 	/// Weapon family used for Blood Brother part compatibility.
 	var/bb_weapon_family = null
 
-/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_gun_part/blood_brother_part, mob/living/user)
-	if(!istype(blood_brother_part, /obj/item/blood_brother_gun_part))
+/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
+	var/part_slot = blood_brother_part?.vars["bb_part_slot"]
+	var/part_family = blood_brother_part?.vars["bb_weapon_family"]
+
+	if(!part_slot || !(part_slot in bb_part_slots))
 		return FALSE
-	if(!blood_brother_part.bb_part_slot || !(blood_brother_part.bb_part_slot in bb_part_slots))
-		return FALSE
-	if(blood_brother_part.bb_weapon_family && blood_brother_part.bb_weapon_family != bb_weapon_family)
+	if(part_family && part_family != bb_weapon_family)
 		return FALSE
 	if(!user || !user.is_holding(blood_brother_part))
 		return FALSE
@@ -102,14 +103,14 @@
 	if(!bb_installed_parts)
 		bb_installed_parts = list()
 
-	var/obj/item/blood_brother_gun_part/old_part = bb_installed_parts[blood_brother_part.bb_part_slot]
+	var/obj/item/old_part = bb_installed_parts[part_slot]
 	if(old_part)
-		bb_installed_parts -= blood_brother_part.bb_part_slot
+		bb_installed_parts -= part_slot
 		if(!user.put_in_hands(old_part))
 			old_part.forceMove(drop_location())
 
 	blood_brother_part.forceMove(src)
-	bb_installed_parts[blood_brother_part.bb_part_slot] = blood_brother_part
+	bb_installed_parts[part_slot] = blood_brother_part
 	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
 	update_appearance()
 	return TRUE
