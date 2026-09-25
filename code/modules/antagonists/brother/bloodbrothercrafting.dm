@@ -69,7 +69,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/cloth = 1,
 		/obj/item/food/meat/slab = 1,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_weapon
 	name = "Brotherly Weapon"
@@ -78,7 +78,7 @@
 	result = /obj/item/knife
 	reqs = list(
 		/obj/item/stack/sheet/iron = 2,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_ammunition
 	name = "Brotherly Ammunition"
@@ -88,7 +88,7 @@
 	result_amount = 2
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_gadget
 	name = "Brotherly Gadget"
@@ -98,7 +98,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/cable_coil = 1,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_explosive
 	name = "Brotherly Explosive"
@@ -108,7 +108,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/cable_coil = 1,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_parts
 	name = "Brotherly Parts"
@@ -118,7 +118,7 @@
 	result_amount = 2
 	reqs = list(
 		/obj/item/stack/sheet/glass = 1,
-	)
+)
 
 /datum/crafting_recipe/blood_brother/brotherly_implant
 	name = "Brotherly Implant"
@@ -128,7 +128,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/sheet/glass = 1,
-	)
+)
 
 
 /datum/crafting_recipe/blood_brother/electrified_bola
@@ -141,9 +141,9 @@
 		/obj/item/stock_parts/power_store/cell = 1,
 		/obj/item/stock_parts/capacitor = 3,
 	)
-	tool_paths = list(
-		/obj/item/multitool,
-		/obj/item/wirecutters,
+	tool_behaviors = list(
+		TOOL_MULTITOOL,
+		TOOL_WIRECUTTER,
 	)
 
 /datum/crafting_recipe/blood_brother/electrified_bola/check_requirements(atom/a, list/collected_requirements)
@@ -153,14 +153,6 @@
 			found_bola = TRUE
 			break
 	if(!found_bola)
-		return FALSE
-
-	var/found_cell = FALSE
-	for(var/obj/item/stock_parts/power_store/cell/cell in collected_requirements[/obj/item/stock_parts/power_store/cell])
-		if(cell.type == /obj/item/stock_parts/power_store/cell)
-			found_cell = TRUE
-			break
-	if(!found_cell)
 		return FALSE
 
 	return ..()
