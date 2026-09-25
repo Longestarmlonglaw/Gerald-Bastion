@@ -63,6 +63,52 @@
 	righthand_file = 'icons/mob/inhands/weapons/guns_righthand.dmi'
 
 	var/obj/item/firing_pin/pin = /obj/item/firing_pin //standard firing pin for most guns
+	/// Blood Brother upgrade slots this gun exposes.
+	var/list/bb_part_slots = list()
+	/// Installed Blood Brother gun parts, keyed by BB_GUN_PART_* slot define.
+	var/list/bb_installed_parts = list()
+	/// Weapon family used for Blood Brother part compatibility.
+	var/bb_weapon_family = null
+
+/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
+	if(!istype(blood_brother_part, /obj/item/blood_brother_gun_part))
+		return FALSE
+	if(!blood_brother_part.bb_part_slot || !(blood_brother_part.bb_part_slot in bb_part_slots))
+		return FALSE
+	if(blood_brother_part.bb_weapon_family && blood_brother_part.bb_weapon_family != bb_weapon_family)
+		return FALSE
+	if(!user || !user.is_holding(blood_brother_part))
+		return FALSE
+
+	if(!bb_installed_parts)
+		bb_installed_parts = list()
+
+	var/obj/item/blood_brother_gun_part/old_part = bb_installed_parts[blood_brother_part.bb_part_slot]
+	if(old_part)
+		bb_installed_parts -= blood_brother_part.bb_part_slot
+		if(!user.put_in_hands(old_part))
+			old_part.forceMove(drop_location())
+
+	blood_brother_part.forceMove(src)
+	bb_installed_parts[blood_brother_part.bb_part_slot] = blood_brother_part
+	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
+	update_appearance()
+	return TRUE
+
+/obj/item/gun/proc/bb_get_part(bb_part_slot)
+	if(!bb_installed_parts)
+		return null
+	return bb_installed_parts[bb_part_slot]
+
+/obj/item/gun/proc/bb_has_part(bb_part_slot)
+	return !!bb_get_part(bb_part_slot)
+
+/obj/item/gun/proc/bb_part_examine()
+	var/list/installed = list()
+	for(var/bb_part_slot in bb_part_slots)
+		var/obj/item/blood_brother_gun_part/part = bb_installed_parts?[bb_part_slot]
+		installed += "[part ? part.name : "empty"]"
+	return installed
 	/// True if a gun dosen't need a pin, mostly used for abstract guns like tentacles and meathooks
 	var/pinless = FALSE
 
