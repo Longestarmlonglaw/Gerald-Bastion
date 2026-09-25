@@ -34,7 +34,7 @@
 	return ..()
 
 /datum/status_effect/electrified_bola/tick(seconds_between_ticks)
-	if(QDELETED(source_bola) || owner.legcuffed != source_bola)
+	if(QDELETED(source_bola) || !istype(owner, /mob/living/carbon) || owner:legcuffed != source_bola)
 		qdel(src)
 		return
 
