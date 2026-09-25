@@ -13,6 +13,7 @@
 		new /datum/crafting_recipe/blood_brother/brotherly_explosive,
 		new /datum/crafting_recipe/blood_brother/brotherly_parts,
 		new /datum/crafting_recipe/blood_brother/brotherly_implant,
+		new /datum/crafting_recipe/blood_brother/electrified_bola,
 	)
 	return
 
@@ -128,3 +129,38 @@
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/sheet/glass = 1,
 	)
+
+
+/datum/crafting_recipe/blood_brother/electrified_bola
+	name = "Electrified Bola"
+	desc = "A modified bola wired to deliver a sustained electrical shock."
+	category = CAT_BB_WEAPONS
+	result = /obj/item/restraints/legcuffs/bola/electrified
+	reqs = list(
+		/obj/item/restraints/legcuffs/bola = 1,
+		/obj/item/stock_parts/power_store/cell = 1,
+		/obj/item/stock_parts/capacitor = 3,
+	)
+	tool_paths = list(
+		/obj/item/multitool,
+		/obj/item/wirecutters,
+	)
+
+/datum/crafting_recipe/blood_brother/electrified_bola/check_requirements(atom/a, list/collected_requirements)
+	var/found_bola = FALSE
+	for(var/obj/item/restraints/legcuffs/bola/bola in collected_requirements[/obj/item/restraints/legcuffs/bola])
+		if(bola.type == /obj/item/restraints/legcuffs/bola)
+			found_bola = TRUE
+			break
+	if(!found_bola)
+		return FALSE
+
+	var/found_cell = FALSE
+	for(var/obj/item/stock_parts/power_store/cell/cell in collected_requirements[/obj/item/stock_parts/power_store/cell])
+		if(cell.type == /obj/item/stock_parts/power_store/cell)
+			found_cell = TRUE
+			break
+	if(!found_cell)
+		return FALSE
+
+	return ..()
