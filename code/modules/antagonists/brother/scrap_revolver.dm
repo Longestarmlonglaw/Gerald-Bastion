@@ -74,6 +74,14 @@
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
 		cylinder.max_ammo = 3
+		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
+		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
+	else
+		cylinder.ammo_type = /obj/item/ammo_casing/c38
+		cylinder.caliber = CALIBER_38
+		cylinder.max_ammo = 6
+		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
+		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
 
 	// A mode switch is only possible with no live rounds. Keep the cylinder's
 	// chamber slots in sync with its current capacity and dump excess casings.
@@ -84,16 +92,5 @@
 			excess_casing.forceMove(drop_location())
 	while(cylinder.stored_ammo.len < cylinder.max_ammo)
 		cylinder.stored_ammo += null
-
-	if(cylinder.shotgun_mode)
-		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
-		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
-	else
-		cylinder.ammo_type = /obj/item/ammo_casing/c38
-		cylinder.caliber = CALIBER_38
-		cylinder.max_ammo = 6
-		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
-		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
-
 	cylinder.update_appearance()
 	update_appearance()
