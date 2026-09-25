@@ -146,8 +146,7 @@
 	update_appearance()
 	return TRUE
 
-/obj/item/gun/AltClick(mob/user)
-	. = ..()
+/obj/item/gun/proc/AltClick(mob/user)
 	if(!bb_part_slots.len || !user)
 		return
 
