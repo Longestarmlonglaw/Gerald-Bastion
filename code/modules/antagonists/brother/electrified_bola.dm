@@ -1,4 +1,4 @@
-/**
+/** 
  * Electrified Blood Brother bola.
  *
  * Uses the normal bola sprite for now as a placeholder.
@@ -26,12 +26,16 @@
 	processing_speed = STATUS_EFFECT_FAST_PROCESS
 	status_type = STATUS_EFFECT_UNIQUE
 	on_remove_on_mob_delete = TRUE
-	alert_type = null
+	alert_type = /atom/movable/screen/alert/status_effect/electrified_bola
 	var/obj/item/restraints/legcuffs/bola/electrified/source_bola
 
 /datum/status_effect/electrified_bola/on_creation(mob/living/new_owner, obj/item/restraints/legcuffs/bola/electrified/new_source)
 	source_bola = new_source
 	return ..()
+
+/datum/status_effect/electrified_bola/on_apply()
+	. = ..()
+	to_chat(owner, span_userdanger("The electrified bola shocks you! Get it off quickly!"))
 
 /datum/status_effect/electrified_bola/tick(seconds_between_ticks)
 	if(QDELETED(source_bola) || !istype(owner, /mob/living/carbon) || owner:legcuffed != source_bola)
@@ -44,3 +48,7 @@
 		owner.stamina.adjust(-stamina_damage)
 
 	owner.take_overall_damage(burn = 2 * seconds_between_ticks)
+
+/atom/movable/screen/alert/status_effect/electrified_bola
+	name = "Electrified Bola"
+	desc = "An electrified bola is attached to you. Remove it quickly!"
