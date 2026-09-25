@@ -167,7 +167,8 @@
 	if(!Adjacent(user) || !user.is_holding(src))
 		return FALSE
 
-	return bb_remove_part(user, selected_part)
+	var/selected_slot = available_parts[selected_part]
+	return bb_remove_part(user, selected_slot)
 
 
 /obj/item/gun/click_alt_secondary(mob/user)
