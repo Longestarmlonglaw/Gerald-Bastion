@@ -146,7 +146,7 @@
 	update_appearance()
 	return TRUE
 
-/obj/item/gun/proc/AltClick(mob/user)
+/obj/item/gun/proc/bb_alt_right_click_remove_part(mob/user)
 	if(!bb_part_slots.len || !user)
 		return
 
@@ -229,7 +229,7 @@
 	. = ..()
 	if(bb_part_slots.len)
 		. += span_notice("This is a modular Blood Brother weapon assembled from scavenged components.")
-		. += span_notice("Its upgrade slots can be inspected below. <b>Alt-click</b> the weapon to remove an installed upgrade.")
+		. += span_notice("Its upgrade slots can be inspected below. <b>Alt-right-click</b> the weapon to remove an installed upgrade.")
 		for(var/slot in bb_part_slots)
 			var/obj/item/part = bb_installed_parts[slot]
 			. += span_notice("[capitalize(slot)]: [part ? part.name : "empty"]")
@@ -337,6 +337,10 @@
 			inside.emp_act(severity)
 
 /obj/item/gun/attack_self_secondary(mob/user, modifiers)
+	if(LAZYACCESS(modifiers, ALT_CLICK) && bb_part_slots.len)
+		bb_alt_right_click_remove_part(user)
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+
 	. = ..()
 	if(.)
 		return
