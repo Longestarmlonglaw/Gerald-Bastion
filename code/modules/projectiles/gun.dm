@@ -148,7 +148,7 @@
 
 /obj/item/gun/proc/bb_alt_right_click_remove_part(mob/user)
 	if(!bb_part_slots.len || !user)
-		return
+		return FALSE
 
 	var/list/available_parts = list()
 	for(var/slot in bb_part_slots)
@@ -158,16 +158,24 @@
 
 	if(!available_parts.len)
 		balloon_alert(user, "no upgrade parts installed!")
-		return
+		return FALSE
 
 	var/selected_part = input(user, "Choose an installed upgrade to remove.", "Blood Brother Upgrades") as null|anything in available_parts
 	if(!selected_part)
-		return
+		return FALSE
 
 	if(!Adjacent(user) || !user.is_holding(src))
-		return
+		return FALSE
 
-	bb_remove_part(user, selected_part)
+	return bb_remove_part(user, selected_part)
+
+
+/obj/item/gun/click_alt_secondary(mob/user)
+	if(!bb_part_slots.len)
+		return ..()
+
+	bb_alt_right_click_remove_part(user)
+	return CLICK_ACTION_BLOCKING
 
 
 /obj/item/gun/Initialize(mapload)
