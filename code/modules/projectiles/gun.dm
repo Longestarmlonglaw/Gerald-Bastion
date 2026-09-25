@@ -63,6 +63,25 @@
 	righthand_file = 'icons/mob/inhands/weapons/guns_righthand.dmi'
 
 	var/obj/item/firing_pin/pin = /obj/item/firing_pin //standard firing pin for most guns
+	/// True if a gun dosen't need a pin, mostly used for abstract guns like tentacles and meathooks
+	var/pinless = FALSE
+
+	var/has_manufacturer = TRUE // Set to true by default. This didn't exist until Brad needed to make a new pipe-gun esque weapon.
+
+	var/ammo_x_offset = 0 //used for positioning ammo count overlay on sprite
+	var/ammo_y_offset = 0
+
+	var/pb_knockback = 0 //tiles of knockback
+	var/pbk_gentle = FALSE //whether getting knocked into a wall/mob will stun
+
+	///a multiplier of the duration the recoil takes to go back to normal view, this is (recoil*recoil_backtime_multiplier)+1
+	var/recoil_backtime_multiplier = 2
+	///this is how much deviation the gun recoil can have, recoil pushes the screen towards the reverse angle you shot + some deviation which this is the max.
+	var/recoil_deviation = 22.5
+
+	/// Cooldown for the visible message sent from gun flipping.
+	COOLDOWN_DECLARE(flip_cooldown)
+
 	/// Blood Brother upgrade slots this gun exposes.
 	var/list/bb_part_slots = list()
 	/// Installed Blood Brother gun parts, keyed by BB_GUN_PART_* slot define.
@@ -106,27 +125,10 @@
 /obj/item/gun/proc/bb_part_examine()
 	var/list/installed = list()
 	for(var/bb_part_slot in bb_part_slots)
-		var/obj/item/blood_brother_gun_part/part = bb_installed_parts?[bb_part_slot]
+		var/obj/item/blood_brother_gun_part/part = bb_installed_parts[bb_part_slot]
 		installed += "[part ? part.name : "empty"]"
 	return installed
-	/// True if a gun dosen't need a pin, mostly used for abstract guns like tentacles and meathooks
-	var/pinless = FALSE
 
-	var/has_manufacturer = TRUE // Set to true by default. This didn't exist until Brad needed to make a new pipe-gun esque weapon.
-
-	var/ammo_x_offset = 0 //used for positioning ammo count overlay on sprite
-	var/ammo_y_offset = 0
-
-	var/pb_knockback = 0 //tiles of knockback
-	var/pbk_gentle = FALSE //whether getting knocked into a wall/mob will stun
-
-	///a multiplier of the duration the recoil takes to go back to normal view, this is (recoil*recoil_backtime_multiplier)+1
-	var/recoil_backtime_multiplier = 2
-	///this is how much deviation the gun recoil can have, recoil pushes the screen towards the reverse angle you shot + some deviation which this is the max.
-	var/recoil_deviation = 22.5
-
-	/// Cooldown for the visible message sent from gun flipping.
-	COOLDOWN_DECLARE(flip_cooldown)
 
 /obj/item/gun/Initialize(mapload)
 	. = ..()
