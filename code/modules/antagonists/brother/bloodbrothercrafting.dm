@@ -111,14 +111,49 @@
 		/obj/item/stack/cable_coil = 1,
 )
 
-/datum/crafting_recipe/blood_brother/brotherly_parts
-	name = "Brotherly Parts"
-	desc = "Spare components reserved for the blood bond."
+/datum/crafting_recipe/blood_brother/magazine_part
+	name = "Magazine"
+	desc = "An improvised ballistic magazine component built around a matter bin."
 	category = CAT_BB_PARTS
-	result = /obj/item/stack/sheet/iron
-	result_amount = 2
+	result = /obj/item/blood_brother_gun_part/magazine
 	reqs = list(
-		/obj/item/stack/sheet/glass = 1,
+		/obj/item/stock_parts/matter_bin = 1,
+)
+
+/datum/crafting_recipe/blood_brother/firing_mechanism_part
+	name = "Firing Mechanism"
+	desc = "An improvised firing mechanism."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/firing_mechanism
+	reqs = list(
+		/obj/item/firing_pin = 1,
+)
+
+/datum/crafting_recipe/blood_brother/barrel_part
+	name = "Barrel"
+	desc = "An improvised ballistic barrel."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/barrel
+	reqs = list(
+		/obj/item/pipe = 1,
+)
+
+/datum/crafting_recipe/blood_brother/power_cell_part
+	name = "Power Cell"
+	desc = "An improvised energy weapon power cell."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/power_cell
+	reqs = list(
+		/obj/item/stock_parts/power_store/cell = 1,
+)
+
+/datum/crafting_recipe/blood_brother/lens_part
+	name = "Lens"
+	desc = "An improvised energy weapon lens."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/lens
+	reqs = list(
+		/obj/item/stock_parts/scanning_module = 1,
 )
 
 /datum/crafting_recipe/blood_brother/brotherly_implant
