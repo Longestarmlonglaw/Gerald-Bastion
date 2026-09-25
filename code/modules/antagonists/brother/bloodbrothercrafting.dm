@@ -14,6 +14,7 @@
 		new /datum/crafting_recipe/blood_brother/brotherly_parts,
 		new /datum/crafting_recipe/blood_brother/brotherly_implant,
 		new /datum/crafting_recipe/blood_brother/electrified_bola,
+		new /datum/crafting_recipe/blood_brother/scrap_revolver,
 	)
 	return
 
@@ -156,3 +157,23 @@
 		return FALSE
 
 	return ..()
+
+
+/datum/crafting_recipe/blood_brother/scrap_revolver
+	name = "Scrap Revolver"
+	desc = "A crude revolver built around a matter-bin cylinder that can be configured for .38 rounds or 12 gauge shells."
+	category = CAT_BB_WEAPONS
+	result = /obj/item/gun/ballistic/revolver/blood_brother_scrap
+	reqs = list(
+		/obj/item/stock_parts/matter_bin = 1,
+		/obj/item/weaponcrafting/receiver = 1,
+		/obj/item/weaponcrafting/stock = 1,
+		/obj/item/pipe = 1,
+		/obj/item/stack/sticky_tape = 1,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+	tool_paths = list(
+		/obj/item/surgicaldrill,
+	)
