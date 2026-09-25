@@ -66,6 +66,13 @@
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
 		cylinder.max_ammo = 3
+		// A mode switch is only possible with no live rounds, so any excess
+		// casings here are spent and can be dumped when reducing capacity.
+		while(cylinder.stored_ammo.len > cylinder.max_ammo)
+			var/obj/item/ammo_casing/spent_casing = cylinder.stored_ammo[cylinder.stored_ammo.len]
+			cylinder.stored_ammo.len--
+			if(spent_casing)
+				spent_casing.forceMove(drop_location())
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
