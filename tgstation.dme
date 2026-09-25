@@ -2522,6 +2522,7 @@
 #include "code\game\objects\items\handcuffs.dm"
 #include "code\modules\antagonists\brother\electrified_bola.dm"
 #include "code\modules\antagonists\brother\scrap_revolver.dm"
+#include "code\modules\antagonists\brother\bloodbrothergunparts.dm"
 #include "code\game\objects\items\his_grace.dm"
 #include "code\game\objects\items\holosign_creator.dm"
 #include "code\game\objects\items\hot_potato.dm"
