@@ -125,10 +125,50 @@
 
 /obj/item/gun/proc/bb_part_examine()
 	var/list/installed = list()
-	for(var/bb_part_slot in bb_part_slots)
-		var/obj/item/blood_brother_gun_part/part = bb_installed_parts[bb_part_slot]
-		installed += "[part ? part.name : "empty"]"
+	for(var/slot in bb_part_slots)
+		var/obj/item/part = bb_installed_parts[slot]
+		installed += "[slot]: [part ? part.name : "empty"]"
 	return installed
+
+/obj/item/gun/proc/bb_remove_part(mob/living/user, slot)
+	if(!bb_installed_parts)
+		return FALSE
+
+	var/obj/item/part = bb_installed_parts[slot]
+	if(!part)
+		return FALSE
+
+	bb_installed_parts -= slot
+	if(!user.put_in_hands(part))
+		part.forceMove(drop_location())
+
+	to_chat(user, span_notice("You remove [part] from [src]."))
+	update_appearance()
+	return TRUE
+
+/obj/item/gun/AltClick(mob/user)
+	. = ..()
+	if(!bb_part_slots.len || !user)
+		return
+
+	var/list/available_parts = list()
+	for(var/slot in bb_part_slots)
+		var/obj/item/part = bb_installed_parts[slot]
+		if(part)
+			available_parts[slot] = part.name
+
+	if(!available_parts.len)
+		balloon_alert(user, "no upgrade parts installed!")
+		return
+
+	var/selected_part = input(user, "Choose an installed upgrade to remove.", "Blood Brother Upgrades") as null|anything in available_parts
+	if(!selected_part)
+		return
+
+	if(!Adjacent(user) || !user.is_holding(src))
+		return
+
+	bb_remove_part(user, selected_part)
 
 
 /obj/item/gun/Initialize(mapload)
@@ -188,6 +228,12 @@
 
 /obj/item/gun/examine(mob/user)
 	. = ..()
+	if(bb_part_slots.len)
+		. += span_notice("This is a modular Blood Brother weapon assembled from scavenged components.")
+		. += span_notice("Its upgrade slots can be inspected below. <b>Alt-click</b> the weapon to remove an installed upgrade.")
+		for(var/slot in bb_part_slots)
+			var/obj/item/part = bb_installed_parts[slot]
+			. += span_notice("[capitalize(slot)]: [part ? part.name : "empty"]")
 	if(!pinless)
 		if(pin)
 			. += "It has \a [pin] installed."
