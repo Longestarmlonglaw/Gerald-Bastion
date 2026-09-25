@@ -84,6 +84,8 @@
 			excess_casing.forceMove(drop_location())
 	while(cylinder.stored_ammo.len < cylinder.max_ammo)
 		cylinder.stored_ammo += null
+
+	if(cylinder.shotgun_mode)
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
