@@ -89,7 +89,7 @@
 	/// Weapon family used for Blood Brother part compatibility.
 	var/bb_weapon_family = null
 
-/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
+/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_gun_part/blood_brother_part, mob/living/user)
 	if(!istype(blood_brother_part, /obj/item/blood_brother_gun_part))
 		return FALSE
 	if(!blood_brother_part.bb_part_slot || !(blood_brother_part.bb_part_slot in bb_part_slots))
