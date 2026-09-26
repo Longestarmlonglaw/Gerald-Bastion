@@ -82,6 +82,103 @@
 	/// Cooldown for the visible message sent from gun flipping.
 	COOLDOWN_DECLARE(flip_cooldown)
 
+	/// Blood Brother upgrade slots this gun exposes.
+	var/list/bb_part_slots = list()
+	/// Installed Blood Brother gun parts, keyed by BB_GUN_PART_* slot define.
+	var/list/bb_installed_parts = list()
+	/// Weapon family used for Blood Brother part compatibility.
+	var/bb_weapon_family = null
+
+/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
+	var/part_slot = blood_brother_part?.vars["bb_part_slot"]
+	var/part_family = blood_brother_part?.vars["bb_weapon_family"]
+
+	if(!part_slot || !(part_slot in bb_part_slots))
+		return FALSE
+	if(part_family && part_family != bb_weapon_family)
+		return FALSE
+	if(!user || !user.is_holding(blood_brother_part))
+		return FALSE
+
+	if(!bb_installed_parts)
+		bb_installed_parts = list()
+
+	var/obj/item/old_part = bb_installed_parts[part_slot]
+	if(old_part)
+		bb_installed_parts -= part_slot
+		if(!user.put_in_hands(old_part))
+			old_part.forceMove(drop_location())
+
+	blood_brother_part.forceMove(src)
+	bb_installed_parts[part_slot] = blood_brother_part
+	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
+	update_appearance()
+	return TRUE
+
+/obj/item/gun/proc/bb_get_part(bb_part_slot)
+	if(!bb_installed_parts)
+		return null
+	return bb_installed_parts[bb_part_slot]
+
+/obj/item/gun/proc/bb_has_part(bb_part_slot)
+	return !!bb_get_part(bb_part_slot)
+
+/obj/item/gun/proc/bb_part_examine()
+	var/list/installed = list()
+	for(var/slot in bb_part_slots)
+		var/obj/item/part = bb_installed_parts[slot]
+		installed += "[slot]: [part ? part.name : "empty"]"
+	return installed
+
+/obj/item/gun/proc/bb_remove_part(mob/living/user, slot)
+	if(!bb_installed_parts)
+		return FALSE
+
+	var/obj/item/part = bb_installed_parts[slot]
+	if(!part)
+		return FALSE
+
+	bb_installed_parts -= slot
+	if(!user.put_in_hands(part))
+		part.forceMove(drop_location())
+
+	to_chat(user, span_notice("You remove [part] from [src]."))
+	update_appearance()
+	return TRUE
+
+/obj/item/gun/proc/bb_alt_right_click_remove_part(mob/user)
+	if(!bb_part_slots.len || !user)
+		return FALSE
+
+	var/list/available_parts = list()
+	for(var/slot in bb_part_slots)
+		var/obj/item/part = bb_installed_parts[slot]
+		if(part)
+			available_parts["[part.name] ([slot])"] = slot
+
+	if(!available_parts.len)
+		balloon_alert(user, "no upgrade parts installed!")
+		return FALSE
+
+	var/selected_part = input(user, "Choose an installed upgrade to remove.", "Blood Brother Upgrades") as null|anything in available_parts
+	if(!selected_part)
+		return FALSE
+
+	if(!Adjacent(user) || !user.is_holding(src))
+		return FALSE
+
+	var/selected_slot = available_parts[selected_part]
+	return bb_remove_part(user, selected_slot)
+
+
+/obj/item/gun/click_alt_secondary(mob/user)
+	if(!bb_part_slots.len)
+		return ..()
+
+	bb_alt_right_click_remove_part(user)
+	return CLICK_ACTION_BLOCKING
+
+
 /obj/item/gun/Initialize(mapload)
 	. = ..()
 	if(pin)
@@ -139,6 +236,12 @@
 
 /obj/item/gun/examine(mob/user)
 	. = ..()
+	if(bb_part_slots.len)
+		. += span_notice("This is a modular Blood Brother weapon assembled from scavenged components.")
+		. += span_notice("Its upgrade slots can be inspected below. <b>Alt-right-click</b> the weapon to remove an installed upgrade.")
+		for(var/slot in bb_part_slots)
+			var/obj/item/part = bb_installed_parts[slot]
+			. += span_notice("[capitalize(slot)]: [part ? part.name : "empty"]")
 	if(!pinless)
 		if(pin)
 			. += "It has \a [pin] installed."
@@ -243,6 +346,10 @@
 			inside.emp_act(severity)
 
 /obj/item/gun/attack_self_secondary(mob/user, modifiers)
+	if(LAZYACCESS(modifiers, ALT_CLICK) && bb_part_slots.len)
+		bb_alt_right_click_remove_part(user)
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+
 	. = ..()
 	if(.)
 		return

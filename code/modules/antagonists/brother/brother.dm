@@ -14,6 +14,8 @@
 	antag_count_points = 5 //duo antag
 	var/datum/action/bb/comms/comms_action
 	var/datum/action/bb/gear/gear_action
+	var/datum/action/bb/crafting/crafting_action
+	var/datum/component/personal_crafting/blood_brother/blood_brother_crafting
 	VAR_PRIVATE/datum/team/brother_team/team
 	///This is used to say who is the big and little brothers. 0 = big, 1 is the middle brother, 2 is little, 3 is little little
 	var/brotherRank = 0
@@ -70,6 +72,11 @@
 	var/mob/living/target = mob_override || owner.current
 	comms_action.Grant(target)
 	gear_action?.Grant(target)
+	if(QDELETED(blood_brother_crafting))
+		blood_brother_crafting = target.AddComponent(/datum/component/personal_crafting/blood_brother)
+	if(QDELETED(crafting_action))
+		crafting_action = new(src)
+	crafting_action.Grant(target)
 	add_team_hud(target, /datum/antagonist/brother, REF(team))
 
 /datum/antagonist/brother/remove_innate_effects(mob/living/mob_override)
@@ -78,6 +85,9 @@
 	QDEL_NULL(comms_action)
 	gear_action?.Remove(mob_override || owner.current)
 	QDEL_NULL(gear_action)
+	crafting_action?.Remove(mob_override || owner.current)
+	QDEL_NULL(crafting_action)
+	QDEL_NULL(blood_brother_crafting)
 
 /datum/antagonist/brother/antag_panel_data()
 	return "Conspirators : [get_brother_names()]"

@@ -65,6 +65,13 @@ const CATEGORY_ICONS_CRAFTING = {
   Tools: 'screwdriver-wrench',
   Entertainment: 'masks-theater',
   'Blood Cult': 'users',
+  Weapons: 'gun',
+  Ammunition: 'crosshairs',
+  'Gadgets & Tools': 'screwdriver-wrench',
+  Armor: 'shield-alt',
+  Explosives: 'bomb',
+  Parts: 'cogs',
+  Implants: 'microchip',
 } as const;
 
 const CATEGORY_ICONS_COOKING = {
