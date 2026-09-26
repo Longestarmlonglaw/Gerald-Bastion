@@ -17,8 +17,7 @@
 		new /datum/crafting_recipe/blood_brother/power_cell_part,
 		new /datum/crafting_recipe/blood_brother/lens_part,
 		new /datum/crafting_recipe/blood_brother/underbarrel_part,
-		new 
-/datum/crafting_recipe/blood_brother/underbarrel_part
+		new /datum/crafting_recipe/blood_brother/underbarrel_part
 	name = "Underbarrel"
 	desc = "An improvised underbarrel component for a Blood Brother weapon."
 	category = CAT_BB_PARTS
