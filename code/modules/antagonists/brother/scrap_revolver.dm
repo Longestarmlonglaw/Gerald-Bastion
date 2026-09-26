@@ -54,8 +54,7 @@
 		balloon_alert(user, "hold to modify!")
 		return TRUE
 
-	// Unlike the normal ammo-modification mechanic, a loaded scrap revolver
-	// catastrophically discharges when someone tries to wrench it.
+	//  unload your gun, dipshit
 	if(get_ammo(FALSE, FALSE))
 		if(!chambered)
 			chamber_round()
