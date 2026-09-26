@@ -167,7 +167,7 @@
 	category = CAT_BB_PARTS
 	result = /obj/item/blood_brother_gun_part/underbarrel
 	reqs = list(
-		/obj/item/ammo_box/magazine/smg/c20r = 1,
+		/obj/item/ammo_box/magazine/smgm45 = 1,
 	)
 
 /datum/crafting_recipe/blood_brother/brotherly_implant
