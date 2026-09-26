@@ -3,6 +3,7 @@
 #define BB_GUN_PART_BARREL "barrel"
 #define BB_GUN_PART_POWER_CELL "power cell"
 #define BB_GUN_PART_LENS "lens"
+#define BB_GUN_PART_UNDERBARREL "underbarrel"
 
 #define BB_GUN_BALLISTIC "ballistic"
 #define BB_GUN_ENERGY "energy"
@@ -68,6 +69,13 @@
 	icon_state = /obj/item/stock_parts/power_store/cell::icon_state
 	bb_part_slot = BB_GUN_PART_POWER_CELL
 	bb_weapon_family = BB_GUN_ENERGY
+
+/obj/item/blood_brother_gun_part/underbarrel
+	name = "underbarrel"
+	desc = "An improvised underbarrel component for a Blood Brother weapon."
+	icon = /obj/item/ammo_box/magazine/c20r::icon
+	icon_state = /obj/item/ammo_box/magazine/c20r::icon_state
+	bb_part_slot = BB_GUN_PART_UNDERBARREL
 
 /obj/item/blood_brother_gun_part/lens
 	name = "lens"
