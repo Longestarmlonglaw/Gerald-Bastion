@@ -16,7 +16,18 @@
 		new /datum/crafting_recipe/blood_brother/barrel_part,
 		new /datum/crafting_recipe/blood_brother/power_cell_part,
 		new /datum/crafting_recipe/blood_brother/lens_part,
-		new /datum/crafting_recipe/blood_brother/brotherly_implant,
+		new /datum/crafting_recipe/blood_brother/underbarrel_part,
+		new 
+/datum/crafting_recipe/blood_brother/underbarrel_part
+	name = "Underbarrel"
+	desc = "An improvised underbarrel component for a Blood Brother weapon."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/underbarrel
+	reqs = list(
+		/obj/item/ammo_box/magazine/c20r = 1,
+	)
+
+/datum/crafting_recipe/blood_brother/brotherly_implant,
 		new /datum/crafting_recipe/blood_brother/electrified_bola,
 		new /datum/crafting_recipe/blood_brother/scrap_revolver,
 	)
