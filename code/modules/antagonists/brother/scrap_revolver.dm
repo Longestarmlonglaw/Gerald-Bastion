@@ -107,3 +107,4 @@
 		bb_installed_parts = list()
 	var/obj/item/blood_brother_gun_part/firing_mechanism/semi_auto/mechanism = new(src)
 	bb_installed_parts[BB_GUN_PART_FIRING_MECHANISM] = mechanism
+	bb_update_firing_mechanism()
