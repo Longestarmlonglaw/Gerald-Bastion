@@ -29,6 +29,62 @@
 		user.visible_message(span_notice("[user] shows you: [icon2html(src, viewers(user))] [name]."), span_notice("You show [src]."))
 	add_fingerprint(user)
 
+/obj/item/card/emag/improvised
+	name = "improvised cryptographic sequencer"
+	desc = "It's a card with some junk circuitry strapped to it. It doesn't look very reliable and needs to be manually recharged with uranium sheets."
+	icon_state = "emag_makeshift"
+	var/charges = 5
+	var/max_charges = 5
+	var/emagging = FALSE
+
+/obj/item/card/emag/improvised/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
+		return NONE
+	if(!can_emag(interacting_with, user))
+		return ITEM_INTERACT_BLOCKING
+	if(charges <= 0)
+		to_chat(user, span_warning("[src] is out of charges."))
+		return ITEM_INTERACT_BLOCKING
+	if(emagging)
+		return ITEM_INTERACT_BLOCKING
+
+	emagging = TRUE
+	if(!do_after(user, rand(5, 10) SECONDS, interacting_with))
+		emagging = FALSE
+		return ITEM_INTERACT_BLOCKING
+
+	charges--
+	if(prob(40))
+		to_chat(user, span_notice("[src] emits a puff of smoke, but nothing happens."))
+		emagging = FALSE
+		return ITEM_INTERACT_BLOCKING
+
+	if(prob(5))
+		user.adjust_fire_stacks(1)
+		user.IgniteMob()
+		to_chat(user, span_danger("The card shorts out and catches fire in your hands!"))
+
+	log_combat(user, interacting_with, "attempted to emag")
+	if(interacting_with.emag_act(user, src))
+		SSblackbox.record_feedback("tally", "atom_emagged", 1, interacting_with.type)
+	else
+		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert this!"))
+
+	emagging = FALSE
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/card/emag/improvised/attackby(obj/item/W, mob/user, params)
+	. = ..()
+	if(max_charges > charges && istype(W, /obj/item/stack/sheet/mineral/uranium))
+		var/obj/item/stack/sheet/mineral/uranium/uranium = W
+		uranium.use(1)
+		charges++
+		to_chat(user, span_notice("You add another charge to [src]. It now has [charges] use[charges == 1 ? "" : "s"] remaining."))
+
+/obj/item/card/emag/improvised/examine(mob/user)
+	. = ..()
+	. += span_notice("The charge meter indicates that it has [charges] charge[charges == 1 ? "" : "s"] remaining out of [max_charges] charges.")
+
 /obj/item/card/emag/bluespace
 	name = "bluespace cryptographic sequencer"
 	desc = "It's a blue card with a magnetic strip attached to some circuitry. It appears to have some sort of transmitter attached to it."
