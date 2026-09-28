@@ -69,10 +69,7 @@
 		user.adjust_fire_stacks(1)
 		to_chat(user, span_danger("The card shorts out and catches fire in your hands!"))
 
-	log_combat(user, interacting_with, "attempted to emag")
-	if(interacting_with.emag_act(user, src))
-		SSblackbox.record_feedback("tally", "atom_emagged", 1, interacting_with.type)
-	else
+	if(!emag_target(interacting_with, user))
 		charges++
 		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert this!"))
 
@@ -146,14 +143,19 @@
 /obj/item/card/emag/storage_insert_on_interaction(datum/storage, atom/storage_holder, mob/living/user)
 	return !(user.istate & ISTATE_HARM)
 
+/obj/item/card/emag/proc/emag_target(atom/target, mob/living/user)
+	log_combat(user, target, "attempted to emag")
+	if(target.emag_act(user, src))
+		SSblackbox.record_feedback("tally", "atom_emagged", 1, target.type)
+		return TRUE
+	return FALSE
+
 /obj/item/card/emag/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
 		return NONE // lets us put things in bags without trying to emag them
 	if(!can_emag(interacting_with, user))
 		return ITEM_INTERACT_BLOCKING
-	log_combat(user, interacting_with, "attempted to emag")
-	if(interacting_with.emag_act(user, src))
-		SSblackbox.record_feedback("tally", "atom_emagged", 1, interacting_with.type)
+	if(emag_target(interacting_with, user))
 		return ITEM_INTERACT_SUCCESS
 	return NONE // In a perfect world this would be blocking, but this is not a perfect world
 
