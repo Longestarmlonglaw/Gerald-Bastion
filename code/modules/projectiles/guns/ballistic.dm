@@ -554,6 +554,13 @@
 	return ..()
 
 /obj/item/gun/ballistic/attack_self(mob/living/user)
+	if(bb_get_firing_mode() in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION) && !bb_action_cycled)
+		if(recent_rack > world.time)
+			return
+		recent_rack = world.time + rack_delay
+		rack(user)
+		bb_action_cycled = TRUE
+		return
 	if(!internal_magazine && magazine)
 		if(!magazine.ammo_count())
 			eject_magazine(user)
