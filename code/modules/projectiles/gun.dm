@@ -655,6 +655,10 @@
 
 /obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
 	var/bb_firing_mode = bb_get_firing_mode()
+	if(bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION) && !bb_action_cycled)
+		if(user)
+			balloon_alert(user, "cycle the [bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "bolt"] first")
+		return FALSE
 	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
 		if(user)
 			balloon_alert(user, "firing mechanism missing")
