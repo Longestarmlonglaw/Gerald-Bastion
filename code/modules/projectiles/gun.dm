@@ -91,7 +91,7 @@
 	/// Original ballistic action settings, restored when the firing mechanism is removed or changed to semi/full auto.
 	var/bb_original_semi_auto
 	var/bb_original_bolt_type
-	var/bb_original_rack_delay
+	var/bb_original_fire_delay
 	var/bb_original_bolt_wording
 	/// Manual-action BB guns must be cycled before the next shot.
 	var/bb_action_cycled = TRUE
@@ -145,18 +145,18 @@
 		if(isnull(bb_original_semi_auto))
 			bb_original_semi_auto = ballistic_gun.semi_auto
 			bb_original_bolt_type = ballistic_gun.bolt_type
-			bb_original_rack_delay = ballistic_gun.rack_delay
+			bb_original_fire_delay = ballistic_gun.fire_delay
 			bb_original_bolt_wording = ballistic_gun.bolt_wording
 
 		if(mechanism && (mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION)))
 			ballistic_gun.semi_auto = FALSE
 			ballistic_gun.bolt_type = BOLT_TYPE_STANDARD
-			ballistic_gun.rack_delay = mechanism.bb_rack_delay
+			ballistic_gun.fire_delay = mechanism.bb_fire_interval
 			ballistic_gun.bolt_wording = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "bolt"
 		else
 			ballistic_gun.semi_auto = bb_original_semi_auto
 			ballistic_gun.bolt_type = bb_original_bolt_type
-			ballistic_gun.rack_delay = bb_original_rack_delay
+			ballistic_gun.fire_delay = bb_original_fire_delay
 			ballistic_gun.bolt_wording = bb_original_bolt_wording
 
 	var/datum/component/automatic_fire/automatic_fire = GetComponent(/datum/component/automatic_fire)
