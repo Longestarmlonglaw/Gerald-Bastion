@@ -290,7 +290,7 @@
 	shaded_charge = FALSE
 
 /obj/item/ammo_casing/energy/laser/hardlight
-	projectile_type = /obj/projectile/beam/laser/hardlight
+	projectile_type = /obj/projectile/beam/laser/hardlight_cannon
 	fire_sound = 'sound/weapons/lasercannonfire.ogg'
 	firing_effect_type = null
 	delay = 1 SECONDS
