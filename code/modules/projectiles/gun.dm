@@ -88,6 +88,13 @@
 	var/list/bb_installed_parts = list()
 	/// Weapon family used for Blood Brother part compatibility.
 	var/bb_weapon_family = null
+	/// Original ballistic action settings, restored when the firing mechanism is removed or changed to semi/full auto.
+	var/bb_original_semi_auto
+	var/bb_original_bolt_type
+	var/bb_original_rack_delay
+	var/bb_original_bolt_wording
+	/// Manual-action BB guns must be cycled before the next shot.
+	var/bb_action_cycled = TRUE
 
 /obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
 	if(bb_parts_loaded())
@@ -115,6 +122,8 @@
 
 	blood_brother_part.forceMove(src)
 	bb_installed_parts[part_slot] = blood_brother_part
+	if(part_slot == BB_GUN_PART_FIRING_MECHANISM)
+		bb_update_firing_mechanism()
 	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
 	update_appearance()
 	return TRUE
@@ -127,6 +136,39 @@
 		if(ballistic_gun.get_ammo(FALSE, FALSE))
 			return TRUE
 	return FALSE
+
+/obj/item/gun/proc/bb_update_firing_mechanism()
+	var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+
+	if(istype(src, /obj/item/gun/ballistic))
+		var/obj/item/gun/ballistic/ballistic_gun = src
+		if(isnull(bb_original_semi_auto))
+			bb_original_semi_auto = ballistic_gun.semi_auto
+			bb_original_bolt_type = ballistic_gun.bolt_type
+			bb_original_rack_delay = ballistic_gun.rack_delay
+			bb_original_bolt_wording = ballistic_gun.bolt_wording
+
+		if(mechanism && mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION))
+			ballistic_gun.semi_auto = FALSE
+			ballistic_gun.bolt_type = BOLT_TYPE_STANDARD
+			ballistic_gun.rack_delay = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? 3 : 5
+			ballistic_gun.bolt_wording = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "bolt"
+		else
+			ballistic_gun.semi_auto = bb_original_semi_auto
+			ballistic_gun.bolt_type = bb_original_bolt_type
+			ballistic_gun.rack_delay = bb_original_rack_delay
+			ballistic_gun.bolt_wording = bb_original_bolt_wording
+
+	var/datum/component/automatic_fire/automatic_fire = GetComponent(/datum/component/automatic_fire)
+	if(mechanism?.bb_firing_mode == BB_GUN_FIRING_FULL_AUTO)
+		if(!automatic_fire)
+			AddComponent(/datum/component/automatic_fire, 0.3 SECONDS)
+	else if(automatic_fire)
+		qdel(automatic_fire)
+
+/obj/item/gun/proc/bb_get_firing_mode()
+	var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+	return mechanism?.bb_firing_mode
 
 /obj/item/gun/proc/bb_get_part(bb_part_slot)
 	if(!bb_installed_parts)
@@ -158,6 +200,8 @@
 	if(!user.put_in_hands(part))
 		part.forceMove(drop_location())
 
+	if(slot == BB_GUN_PART_FIRING_MECHANISM)
+		bb_update_firing_mechanism()
 	to_chat(user, span_notice("You remove [part] from [src]."))
 	update_appearance()
 	return TRUE
@@ -457,6 +501,10 @@
 	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
 		balloon_alert(user, "firing mechanism missing")
 		return FALSE
+	var/bb_firing_mode = bb_get_firing_mode()
+	if(bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION) && !bb_action_cycled)
+		balloon_alert(user, "cycle the [bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "bolt"] first")
+		return FALSE
 	if(QDELETED(target))
 		return
 	if(firing_burst)
@@ -664,6 +712,8 @@
 			process_chamber()
 			update_appearance()
 			semicd = TRUE
+			if(bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION))
+				bb_action_cycled = FALSE
 			addtimer(CALLBACK(src, PROC_REF(reset_semicd)), modified_delay)
 
 	if(user)
