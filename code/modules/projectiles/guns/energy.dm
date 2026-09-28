@@ -171,10 +171,8 @@
 
 /obj/item/gun/energy/attack_self(mob/living/user as mob)
 	if(bb_get_firing_mode() in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION) && !bb_action_cycled)
-		balloon_alert(user, "cycling [bb_get_firing_mode() == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "action"]...")
-		if(do_after(user, bb_get_firing_mode() == BB_GUN_FIRING_PUMP_ACTION ? 3 : 5, src))
-			bb_action_cycled = TRUE
-			balloon_alert(user, "[bb_get_firing_mode() == BB_GUN_FIRING_PUMP_ACTION ? "pumped" : "action cycled"]")
+		bb_action_cycled = TRUE
+		balloon_alert(user, "[bb_get_firing_mode() == BB_GUN_FIRING_PUMP_ACTION ? "pumped" : "action cycled"]")
 		return
 	if(ammo_type.len > 1 && can_select)
 		select_fire(user)
