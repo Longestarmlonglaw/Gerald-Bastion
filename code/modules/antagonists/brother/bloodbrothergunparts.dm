@@ -53,6 +53,23 @@
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
+	var/bb_firing_mode = "semi-auto"
+
+/obj/item/blood_brother_gun_part/firing_mechanism/semi_auto
+	name = "semi-auto firing mechanism"
+	bb_firing_mode = "semi-auto"
+
+/obj/item/blood_brother_gun_part/firing_mechanism/full_auto
+	name = "full-auto firing mechanism"
+	bb_firing_mode = "full auto"
+
+/obj/item/blood_brother_gun_part/firing_mechanism/bolt_action
+	name = "bolt-action firing mechanism"
+	bb_firing_mode = "bolt action"
+
+/obj/item/blood_brother_gun_part/firing_mechanism/pump_action
+	name = "pump-action firing mechanism"
+	bb_firing_mode = "pump action"
 
 /obj/item/blood_brother_gun_part/barrel
 	name = "barrel"
