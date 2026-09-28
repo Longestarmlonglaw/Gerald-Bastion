@@ -90,6 +90,10 @@
 	var/bb_weapon_family = null
 
 /obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
+	if(bb_parts_loaded())
+		balloon_alert(user, "cannot modify, unload first")
+		return FALSE
+
 	var/part_slot = blood_brother_part?.vars["bb_part_slot"]
 	var/part_family = blood_brother_part?.vars["bb_weapon_family"]
 
@@ -115,6 +119,15 @@
 	update_appearance()
 	return TRUE
 
+/obj/item/gun/proc/bb_parts_loaded()
+	if(chambered?.loaded_projectile)
+		return TRUE
+	if(istype(src, /obj/item/gun/ballistic))
+		var/obj/item/gun/ballistic/ballistic_gun = src
+		if(ballistic_gun.get_ammo(FALSE, FALSE))
+			return TRUE
+	return FALSE
+
 /obj/item/gun/proc/bb_get_part(bb_part_slot)
 	if(!bb_installed_parts)
 		return null
@@ -131,6 +144,9 @@
 	return installed
 
 /obj/item/gun/proc/bb_remove_part(mob/living/user, slot)
+	if(bb_parts_loaded())
+		balloon_alert(user, "cannot modify, unload first")
+		return FALSE
 	if(!bb_installed_parts)
 		return FALSE
 
@@ -147,6 +163,9 @@
 	return TRUE
 
 /obj/item/gun/proc/bb_alt_right_click_remove_part(mob/user)
+	if(bb_parts_loaded())
+		balloon_alert(user, "cannot modify, unload first")
+		return FALSE
 	if(!bb_part_slots.len || !user)
 		return FALSE
 
@@ -435,6 +454,9 @@
 	return fire_gun(target, user, user.Adjacent(target), params)
 
 /obj/item/gun/proc/fire_gun(atom/target, mob/living/user, flag, params)
+	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
+		balloon_alert(user, "firing mechanism missing")
+		return FALSE
 	if(QDELETED(target))
 		return
 	if(firing_burst)
@@ -583,6 +605,10 @@
 	return TRUE
 
 /obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
+	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
+		if(user)
+			balloon_alert(user, "firing mechanism missing")
+		return FALSE
 	if(user)
 		SEND_SIGNAL(user, COMSIG_MOB_FIRED_GUN, src, target, params, zone_override)
 
