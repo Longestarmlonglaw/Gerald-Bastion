@@ -12,7 +12,10 @@
 		new /datum/crafting_recipe/blood_brother/brotherly_gadget,
 		new /datum/crafting_recipe/blood_brother/brotherly_explosive,
 		new /datum/crafting_recipe/blood_brother/magazine_part,
-		new /datum/crafting_recipe/blood_brother/firing_mechanism_part,
+		new /datum/crafting_recipe/blood_brother/semi_auto_firing_mechanism_part,
+		new /datum/crafting_recipe/blood_brother/full_auto_firing_mechanism_part,
+		new /datum/crafting_recipe/blood_brother/bolt_action_firing_mechanism_part,
+		new /datum/crafting_recipe/blood_brother/pump_action_firing_mechanism_part,
 		new /datum/crafting_recipe/blood_brother/barrel_part,
 		new /datum/crafting_recipe/blood_brother/power_cell_part,
 		new /datum/crafting_recipe/blood_brother/lens_part,
@@ -126,11 +129,38 @@
 		/obj/item/stock_parts/matter_bin = 1,
 )
 
-/datum/crafting_recipe/blood_brother/firing_mechanism_part
-	name = "Firing Mechanism"
-	desc = "An improvised firing mechanism."
+/datum/crafting_recipe/blood_brother/semi_auto_firing_mechanism_part
+	name = "Semi-Auto Firing Mechanism"
+	desc = "An improvised semi-automatic firing mechanism."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/firing_mechanism
+	result = /obj/item/blood_brother_gun_part/firing_mechanism/semi_auto
+	reqs = list(
+		/obj/item/firing_pin = 1,
+)
+
+/datum/crafting_recipe/blood_brother/full_auto_firing_mechanism_part
+	name = "Full-Auto Firing Mechanism"
+	desc = "An improvised automatic firing mechanism."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/firing_mechanism/full_auto
+	reqs = list(
+		/obj/item/firing_pin = 1,
+)
+
+/datum/crafting_recipe/blood_brother/bolt_action_firing_mechanism_part
+	name = "Bolt-Action Firing Mechanism"
+	desc = "An improvised bolt-action firing mechanism."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/firing_mechanism/bolt_action
+	reqs = list(
+		/obj/item/firing_pin = 1,
+)
+
+/datum/crafting_recipe/blood_brother/pump_action_firing_mechanism_part
+	name = "Pump-Action Firing Mechanism"
+	desc = "An improvised pump-action firing mechanism."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/firing_mechanism/pump_action
 	reqs = list(
 		/obj/item/firing_pin = 1,
 )
