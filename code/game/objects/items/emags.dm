@@ -37,6 +37,12 @@
 	var/max_charges = 5
 	var/emagging = FALSE
 
+/obj/item/card/emag/improvised/can_emag(atom/target, mob/user)
+	if(istype(target, /obj/machinery/computer/cargo))
+		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert a supply console."))
+		return FALSE
+	return ..()
+
 /obj/item/card/emag/improvised/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
 		return NONE
