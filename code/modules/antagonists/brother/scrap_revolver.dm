@@ -100,3 +100,10 @@
 		cylinder.stored_ammo += null
 	cylinder.update_appearance()
 	update_appearance()
+
+/obj/item/gun/ballistic/revolver/blood_brother_scrap/Initialize(mapload)
+	. = ..()
+	if(!bb_installed_parts)
+		bb_installed_parts = list()
+	var/obj/item/blood_brother_gun_part/firing_mechanism/semi_auto/mechanism = new(src)
+	bb_installed_parts[BB_GUN_PART_FIRING_MECHANISM] = mechanism
