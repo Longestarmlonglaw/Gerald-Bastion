@@ -148,7 +148,7 @@
 			bb_original_rack_delay = ballistic_gun.rack_delay
 			bb_original_bolt_wording = ballistic_gun.bolt_wording
 
-		if(mechanism && mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION))
+		if(mechanism && (mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION)))
 			ballistic_gun.semi_auto = FALSE
 			ballistic_gun.bolt_type = BOLT_TYPE_STANDARD
 			ballistic_gun.rack_delay = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? 3 : 5
