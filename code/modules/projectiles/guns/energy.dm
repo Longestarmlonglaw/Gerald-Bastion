@@ -170,7 +170,7 @@
 		update_appearance()
 
 /obj/item/gun/energy/attack_self(mob/living/user as mob)
-	if(bb_weapon_family && bb_get_firing_mode() in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION) && !bb_action_cycled)
+	if(bb_weapon_family && (bb_get_firing_mode() in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION)) && !bb_action_cycled)
 		bb_action_cycled = TRUE
 		balloon_alert(user, "[bb_get_firing_mode() == BB_GUN_FIRING_PUMP_ACTION ? "pumped" : "action cycled"]")
 		return
