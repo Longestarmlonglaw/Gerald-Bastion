@@ -168,6 +168,14 @@
 	else if(automatic_fire)
 		qdel(automatic_fire)
 
+	if(istype(src, /obj/item/gun/energy))
+		if(isnull(bb_original_fire_delay))
+			bb_original_fire_delay = fire_delay
+		if(mechanism && (mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION)))
+			fire_delay = mechanism.bb_fire_interval
+		else
+			fire_delay = bb_original_fire_delay
+
 /obj/item/gun/proc/bb_get_firing_mode()
 	var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
 	return mechanism?.bb_firing_mode
