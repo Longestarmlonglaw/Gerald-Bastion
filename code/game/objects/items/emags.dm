@@ -37,6 +37,12 @@
 	var/max_charges = 5
 	var/emagging = FALSE
 
+/obj/item/card/emag/improvised/can_emag(atom/target, mob/user)
+	if(ismob(target) || istype(target, /obj/structure/chair))
+		to_chat(user, span_warning("The [src] cannot interface with [target]."))
+		return FALSE
+	return ..()
+
 /obj/item/card/emag/improvised/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
 		return NONE
@@ -67,6 +73,7 @@
 	if(interacting_with.emag_act(user, src))
 		SSblackbox.record_feedback("tally", "atom_emagged", 1, interacting_with.type)
 	else
+		charges++
 		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert this!"))
 
 	emagging = FALSE
