@@ -160,6 +160,7 @@
 			ballistic_gun.bolt_wording = bb_original_bolt_wording
 
 	var/datum/component/automatic_fire/automatic_fire = GetComponent(/datum/component/automatic_fire)
+	bb_action_cycled = TRUE
 	if(mechanism?.bb_firing_mode == BB_GUN_FIRING_FULL_AUTO)
 		if(!automatic_fire)
 			AddComponent(/datum/component/automatic_fire, 0.3 SECONDS)
@@ -653,6 +654,7 @@
 	return TRUE
 
 /obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
+	var/bb_firing_mode = bb_get_firing_mode()
 	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
 		if(user)
 			balloon_alert(user, "firing mechanism missing")
