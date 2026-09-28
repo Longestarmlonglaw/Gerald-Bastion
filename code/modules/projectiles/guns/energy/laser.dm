@@ -276,3 +276,21 @@
 	desc = "A laser gun modified to cost 20 credits to fire. Point towards poor people."
 	pin = /obj/item/firing_pin/paywall/luxury
 
+
+
+/obj/item/gun/energy/laser/hardlight
+	name = "hardlight laser cannon"
+	desc = "A crude laser cannon that fires incredibly dense beams of hardlight. The beam is solid enough to be stopped by glass and grilles."
+	icon_state = "lasercannon"
+	inhand_icon_state = null
+	ammo_type = list(/obj/item/ammo_casing/energy/laser/hardlight)
+	fire_delay = 10
+	ammo_x_offset = 3
+	weapon_weight = WEAPON_HEAVY
+	shaded_charge = FALSE
+
+/obj/item/ammo_casing/energy/laser/hardlight
+	projectile_type = /obj/projectile/beam/laser/hardlight
+	fire_sound = 'sound/weapons/lasercannonfire.ogg'
+	firing_effect_type = null
+	delay = 1 SECONDS
