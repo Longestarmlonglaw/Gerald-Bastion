@@ -8,6 +8,11 @@
 #define BB_GUN_BALLISTIC "ballistic"
 #define BB_GUN_ENERGY "energy"
 
+#define BB_GUN_FIRING_SEMI_AUTO "semi-auto"
+#define BB_GUN_FIRING_FULL_AUTO "full auto"
+#define BB_GUN_FIRING_BOLT_ACTION "bolt action"
+#define BB_GUN_FIRING_PUMP_ACTION "pump action"
+
 /**
  * Blood Brother gun parts.
  *
@@ -53,23 +58,23 @@
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
-	var/bb_firing_mode = "semi-auto"
+	var/bb_firing_mode = BB_GUN_FIRING_SEMI_AUTO
 
 /obj/item/blood_brother_gun_part/firing_mechanism/semi_auto
 	name = "semi-auto firing mechanism"
-	bb_firing_mode = "semi-auto"
+	bb_firing_mode = BB_GUN_FIRING_SEMI_AUTO
 
 /obj/item/blood_brother_gun_part/firing_mechanism/full_auto
 	name = "full-auto firing mechanism"
-	bb_firing_mode = "full auto"
+	bb_firing_mode = BB_GUN_FIRING_FULL_AUTO
 
 /obj/item/blood_brother_gun_part/firing_mechanism/bolt_action
 	name = "bolt-action firing mechanism"
-	bb_firing_mode = "bolt action"
+	bb_firing_mode = BB_GUN_FIRING_BOLT_ACTION
 
 /obj/item/blood_brother_gun_part/firing_mechanism/pump_action
 	name = "pump-action firing mechanism"
-	bb_firing_mode = "pump action"
+	bb_firing_mode = BB_GUN_FIRING_PUMP_ACTION
 
 /obj/item/blood_brother_gun_part/barrel
 	name = "barrel"
