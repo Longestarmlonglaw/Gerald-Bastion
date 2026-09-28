@@ -20,6 +20,7 @@
 		new /datum/crafting_recipe/blood_brother/brotherly_implant,
 		new /datum/crafting_recipe/blood_brother/electrified_bola,
 		new /datum/crafting_recipe/blood_brother/scrap_revolver,
+		new /datum/crafting_recipe/blood_brother/makeshift_emag,
 	)
 	return
 
@@ -207,6 +208,24 @@
 
 	return ..()
 
+
+
+/datum/crafting_recipe/blood_brother/makeshift_emag
+	name = "Improvised Emag"
+	desc = "A crude cryptographic sequencer assembled from scavenged electronics. It is slow, unreliable, and must be manually recharged."
+	category = CAT_BB_GADGETS
+	result = /obj/item/card/emag/improvised
+	reqs = list(
+		/obj/item/stock_parts/subspace/amplifier = 1,
+		/obj/item/card/id = 1,
+		/obj/item/electronics/firelock = 1,
+		/obj/item/stack/cable_coil = 10,
+	)
+	tool_behaviors = list(
+		TOOL_MULTITOOL,
+		TOOL_WIRECUTTER,
+	)
+	time = 12 SECONDS
 
 /datum/crafting_recipe/blood_brother/scrap_revolver
 	name = "Scrap Revolver"
