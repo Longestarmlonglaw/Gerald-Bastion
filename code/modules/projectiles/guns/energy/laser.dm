@@ -288,6 +288,18 @@
 	ammo_x_offset = 3
 	weapon_weight = WEAPON_HEAVY
 	shaded_charge = FALSE
+	bb_weapon_family = BB_GUN_ENERGY
+	bb_part_slots = list(
+		BB_GUN_PART_FIRING_MECHANISM,
+		BB_GUN_PART_POWER_CELL,
+		BB_GUN_PART_LENS,
+	)
+
+/obj/item/gun/energy/laser/hardlight/Initialize(mapload)
+	. = ..()
+	var/obj/item/blood_brother_gun_part/firing_mechanism/default_mechanism = new /obj/item/blood_brother_gun_part/firing_mechanism/bolt_action(src)
+	bb_installed_parts[BB_GUN_PART_FIRING_MECHANISM] = default_mechanism
+	bb_update_firing_mechanism()
 
 /obj/item/ammo_casing/energy/laser/hardlight
 	projectile_type = /obj/projectile/beam/laser/hardlight_cannon
