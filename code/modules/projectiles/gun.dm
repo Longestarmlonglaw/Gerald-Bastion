@@ -151,7 +151,7 @@
 		if(mechanism && (mechanism.bb_firing_mode in list(BB_GUN_FIRING_BOLT_ACTION, BB_GUN_FIRING_PUMP_ACTION)))
 			ballistic_gun.semi_auto = FALSE
 			ballistic_gun.bolt_type = BOLT_TYPE_STANDARD
-			ballistic_gun.rack_delay = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? 3 : 5
+			ballistic_gun.rack_delay = mechanism.bb_rack_delay
 			ballistic_gun.bolt_wording = mechanism.bb_firing_mode == BB_GUN_FIRING_PUMP_ACTION ? "pump" : "bolt"
 		else
 			ballistic_gun.semi_auto = bb_original_semi_auto
@@ -162,8 +162,9 @@
 	var/datum/component/automatic_fire/automatic_fire = GetComponent(/datum/component/automatic_fire)
 	bb_action_cycled = TRUE
 	if(mechanism?.bb_firing_mode == BB_GUN_FIRING_FULL_AUTO)
-		if(!automatic_fire)
-			AddComponent(/datum/component/automatic_fire, 0.3 SECONDS)
+		if(automatic_fire)
+			qdel(automatic_fire)
+		AddComponent(/datum/component/automatic_fire, mechanism.bb_fire_rate)
 	else if(automatic_fire)
 		qdel(automatic_fire)
 
@@ -702,6 +703,10 @@
 					return
 			sprd = round((rand(0, 1) - 0.5) * DUALWIELD_PENALTY_EXTRA_MULTIPLIER * (randomized_gun_spread + randomized_bonus_spread))
 			before_firing(target,user)
+			var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+			if(mechanism && chambered.loaded_projectile)
+				chambered.loaded_projectile.damage *= mechanism.bb_damage_multiplier
+				chambered.loaded_projectile.speed *= mechanism.bb_projectile_speed_multiplier
 			if(!chambered.fire_casing(target, user, params, , suppressed, zone_override, sprd, src))
 				shoot_with_empty_chamber(user)
 				return
