@@ -164,12 +164,19 @@
 /obj/projectile/beam/laser/hardlight
 	name = "hardlight laser"
 	pass_flags = PASSTABLE
+	damage = 32
+	damage_type = BURN
+	range = 8
+
+/obj/projectile/beam/laser/hardlight_cannon
+	name = "hardlight laser"
+	pass_flags = PASSTABLE
 	damage = 24
 	damage_type = BURN
 	range = 8
 	eyeblur = 2 SECONDS
 
-/obj/projectile/beam/laser/hardlight/on_hit(atom/target, blocked = 0, pierce_hit)
+/obj/projectile/beam/laser/hardlight_cannon/on_hit(atom/target, blocked = 0, pierce_hit)
 	. = ..()
 	if(iscarbon(target) && !blocked)
 		var/mob/living/carbon/carbon_target = target
