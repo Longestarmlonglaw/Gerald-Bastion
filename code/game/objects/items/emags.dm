@@ -61,7 +61,6 @@
 
 	if(prob(5))
 		user.adjust_fire_stacks(1)
-		user.IgniteMob()
 		to_chat(user, span_danger("The card shorts out and catches fire in your hands!"))
 
 	log_combat(user, interacting_with, "attempted to emag")
