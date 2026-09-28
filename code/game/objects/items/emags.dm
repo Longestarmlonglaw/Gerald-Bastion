@@ -37,12 +37,6 @@
 	var/max_charges = 5
 	var/emagging = FALSE
 
-/obj/item/card/emag/improvised/can_emag(atom/target, mob/user)
-	if(istype(target, /obj/machinery/computer/cargo))
-		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert a supply console."))
-		return FALSE
-	return ..()
-
 /obj/item/card/emag/improvised/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
 		return NONE
@@ -224,7 +218,7 @@
 	. = ..()
 	. += span_notice("It has [charges] charges remaining.")
 	if (length(charge_timers))
-		. += "[span_notice("<b>A small display on the back reads:")]</b>"
+		. += \"[span_notice("<b>A small display on the back reads:")]</b>\"
 	for (var/i in 1 to length(charge_timers))
 		var/timeleft = timeleft(charge_timers[i])
 		var/loadingbar = num2loadingbar(timeleft/charge_time)
