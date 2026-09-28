@@ -71,7 +71,7 @@
 
 	if(!emag_target(interacting_with, user))
 		charges++
-		to_chat(user, span_notice("The cheap circuitry isn't strong enough to subvert this!"))
+		to_chat(user, span_notice("The [src] fails to emag [interacting_with]!"))
 
 	emagging = FALSE
 	return ITEM_INTERACT_SUCCESS
