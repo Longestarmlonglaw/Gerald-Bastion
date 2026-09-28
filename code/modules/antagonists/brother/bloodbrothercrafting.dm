@@ -23,6 +23,7 @@
 		new /datum/crafting_recipe/blood_brother/brotherly_implant,
 		new /datum/crafting_recipe/blood_brother/electrified_bola,
 		new /datum/crafting_recipe/blood_brother/scrap_revolver,
+		new /datum/crafting_recipe/blood_brother/hardlight_laser_cannon,
 		new /datum/crafting_recipe/blood_brother/makeshift_emag,
 	)
 	return
@@ -274,4 +275,17 @@
 	)
 	tool_paths = list(
 		/obj/item/surgicaldrill,
+	)
+
+
+/datum/crafting_recipe/blood_brother/hardlight_laser_cannon
+	name = "Hardlight Laser Cannon"
+	desc = "A crude laser cannon that fires dense beams of hardlight."
+	category = CAT_BB_WEAPONS
+	result = /obj/item/gun/energy/laser/hardlight
+	reqs = list(
+		/obj/item/stock_parts/matter_bin = 1,
+		/obj/item/stock_parts/power_store/cell = 1,
+		/obj/item/stock_parts/scanning_module = 1,
+		/obj/item/stock_parts/capacitor = 2,
 	)
