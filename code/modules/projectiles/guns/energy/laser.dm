@@ -293,6 +293,7 @@
 		BB_GUN_PART_FIRING_MECHANISM,
 		BB_GUN_PART_POWER_CELL,
 		BB_GUN_PART_LENS,
+		BB_GUN_PART_UNDERBARREL,
 	)
 
 /obj/item/gun/energy/laser/hardlight/Initialize(mapload)
