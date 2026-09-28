@@ -164,7 +164,7 @@
 	if(mechanism?.bb_firing_mode == BB_GUN_FIRING_FULL_AUTO)
 		if(automatic_fire)
 			qdel(automatic_fire)
-		AddComponent(/datum/component/automatic_fire, mechanism.bb_fire_rate)
+		AddComponent(/datum/component/automatic_fire, mechanism.bb_fire_interval)
 	else if(automatic_fire)
 		qdel(automatic_fire)
 
