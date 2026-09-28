@@ -59,6 +59,14 @@
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
 	var/bb_firing_mode = BB_GUN_FIRING_SEMI_AUTO
+	/// Multiplier applied to projectile damage when this mechanism is installed.
+	var/bb_damage_multiplier = 1
+	/// Multiplier applied to projectile speed when this mechanism is installed.
+	var/bb_projectile_speed_multiplier = 1
+	/// Delay used to cycle a manual-action mechanism. Only present on manual-action mechanisms.
+	var/bb_rack_delay
+	/// Delay between automatic shots. Only present on full-auto mechanisms.
+	var/bb_fire_rate
 
 /obj/item/blood_brother_gun_part/firing_mechanism/semi_auto
 	name = "semi-auto firing mechanism"
@@ -67,14 +75,23 @@
 /obj/item/blood_brother_gun_part/firing_mechanism/full_auto
 	name = "full-auto firing mechanism"
 	bb_firing_mode = BB_GUN_FIRING_FULL_AUTO
+	bb_damage_multiplier = 1
+	bb_projectile_speed_multiplier = 1
+	bb_fire_rate = 0.2 SECONDS
 
 /obj/item/blood_brother_gun_part/firing_mechanism/bolt_action
 	name = "bolt-action firing mechanism"
 	bb_firing_mode = BB_GUN_FIRING_BOLT_ACTION
+	bb_damage_multiplier = 1.2
+	bb_projectile_speed_multiplier = 1.2
+	bb_rack_delay = 5
 
 /obj/item/blood_brother_gun_part/firing_mechanism/pump_action
 	name = "pump-action firing mechanism"
 	bb_firing_mode = BB_GUN_FIRING_PUMP_ACTION
+	bb_damage_multiplier = 1.1
+	bb_projectile_speed_multiplier = 1.1
+	bb_rack_delay = 3
 
 /obj/item/blood_brother_gun_part/barrel
 	name = "barrel"
