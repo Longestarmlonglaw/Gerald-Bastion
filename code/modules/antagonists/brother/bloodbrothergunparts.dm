@@ -1,5 +1,5 @@
 #define BB_GUN_PART_MAGAZINE "magazine"
-#define BB_GUN_PART_FIRING_MECHANISM "receiver"
+#define BB_GUN_PART_RECEIVER "receiver"
 #define BB_GUN_PART_BARREL "barrel"
 #define BB_GUN_PART_POWER_CELL "power cell"
 #define BB_GUN_PART_LENS "lens"
@@ -57,7 +57,7 @@
 	desc = "An improvised receiver that determines how a weapon cycles between shots."
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
-	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
+	bb_part_slot = BB_GUN_PART_RECEIVER
 	var/bb_receiver_type = BB_GUN_RECEIVER_SEMI_AUTO
 	/// Multiplier applied to projectile damage when this mechanism is installed.
 	var/bb_damage_multiplier = 1
