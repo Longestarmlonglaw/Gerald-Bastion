@@ -1,5 +1,5 @@
 #define BB_GUN_PART_MAGAZINE "magazine"
-#define BB_GUN_PART_FIRING_MECHANISM "firing mechanism"
+#define BB_GUN_PART_FIRING_MECHANISM "receiver"
 #define BB_GUN_PART_BARREL "barrel"
 #define BB_GUN_PART_POWER_CELL "power cell"
 #define BB_GUN_PART_LENS "lens"
@@ -8,10 +8,10 @@
 #define BB_GUN_BALLISTIC "ballistic"
 #define BB_GUN_ENERGY "energy"
 
-#define BB_GUN_FIRING_SEMI_AUTO "semi-auto"
-#define BB_GUN_FIRING_FULL_AUTO "full auto"
-#define BB_GUN_FIRING_BOLT_ACTION "bolt action"
-#define BB_GUN_FIRING_PUMP_ACTION "pump action"
+#define BB_GUN_RECEIVER_SEMI_AUTO "semi-auto"
+#define BB_GUN_RECEIVER_AUTOMATIC "full auto"
+#define BB_GUN_RECEIVER_RIFLE "bolt action"
+#define BB_GUN_RECEIVER_CARBINE "pump action"
 
 /**
  * Blood Brother gun parts.
@@ -52,13 +52,13 @@
 	bb_part_slot = BB_GUN_PART_MAGAZINE
 	bb_weapon_family = BB_GUN_BALLISTIC
 
-/obj/item/blood_brother_gun_part/firing_mechanism
-	name = "firing mechanism"
-	desc = "An improvised firing mechanism that determines how a weapon cycles between shots."
+/obj/item/blood_brother_gun_part/receiver
+	name = "receiver"
+	desc = "An improvised receiver that determines how a weapon cycles between shots."
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
-	var/bb_firing_mode = BB_GUN_FIRING_SEMI_AUTO
+	var/bb_firing_mode = BB_GUN_RECEIVER_SEMI_AUTO
 	/// Multiplier applied to projectile damage when this mechanism is installed.
 	var/bb_damage_multiplier = 1
 	/// Multiplier applied to projectile speed when this mechanism is installed.
@@ -66,27 +66,27 @@
 	/// Firing interval for this mechanism. Used as the gun's delay between shots.
 	var/bb_fire_interval
 
-/obj/item/blood_brother_gun_part/firing_mechanism/semi_auto
-	name = "semi-auto firing mechanism"
-	bb_firing_mode = BB_GUN_FIRING_SEMI_AUTO
+/obj/item/blood_brother_gun_part/receiver/semi_auto
+	name = "semi-auto receiver"
+	bb_firing_mode = BB_GUN_RECEIVER_SEMI_AUTO
 
-/obj/item/blood_brother_gun_part/firing_mechanism/full_auto
-	name = "full-auto firing mechanism"
-	bb_firing_mode = BB_GUN_FIRING_FULL_AUTO
+/obj/item/blood_brother_gun_part/receiver/automatic
+	name = "automatic receiver"
+	bb_firing_mode = BB_GUN_RECEIVER_AUTOMATIC
 	bb_damage_multiplier = 1
 	bb_projectile_speed_multiplier = 1
 	bb_fire_interval = 0.2 SECONDS
 
-/obj/item/blood_brother_gun_part/firing_mechanism/bolt_action
-	name = "bolt-action firing mechanism"
-	bb_firing_mode = BB_GUN_FIRING_BOLT_ACTION
+/obj/item/blood_brother_gun_part/receiver/rifle
+	name = "rifle receiver"
+	bb_firing_mode = BB_GUN_RECEIVER_RIFLE
 	bb_damage_multiplier = 1.2
 	bb_projectile_speed_multiplier = 1.2
 	bb_fire_interval = 1.2 SECONDS
 
-/obj/item/blood_brother_gun_part/firing_mechanism/pump_action
-	name = "pump-action firing mechanism"
-	bb_firing_mode = BB_GUN_FIRING_PUMP_ACTION
+/obj/item/blood_brother_gun_part/receiver/carbine
+	name = "carbine receiver"
+	bb_firing_mode = BB_GUN_RECEIVER_CARBINE
 	bb_damage_multiplier = 1.1
 	bb_projectile_speed_multiplier = 1.1
 	bb_fire_interval = 1 SECONDS
