@@ -144,7 +144,7 @@
 		fire_delay = bb_original_fire_delay
 
 	var/datum/component/automatic_fire/automatic_fire = GetComponent(/datum/component/automatic_fire)
-	if(receiver?.bb_firing_mode == BB_GUN_RECEIVER_AUTOMATIC)
+	if(receiver?.bb_receiver_type == BB_GUN_RECEIVER_AUTOMATIC)
 		if(automatic_fire)
 			qdel(automatic_fire)
 		AddComponent(/datum/component/automatic_fire, receiver.bb_fire_interval)
@@ -153,7 +153,7 @@
 
 /obj/item/gun/proc/bb_get_receiver_type()
 	var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
-	return receiver?.bb_firing_mode
+	return receiver?.bb_receiver_type
 
 /obj/item/gun/proc/bb_get_part(bb_part_slot)
 	if(!bb_installed_parts)
