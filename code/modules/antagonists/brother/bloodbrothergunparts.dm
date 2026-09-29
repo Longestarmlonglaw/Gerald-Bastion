@@ -9,9 +9,9 @@
 #define BB_GUN_ENERGY "energy"
 
 #define BB_GUN_RECEIVER_SEMI_AUTO "semi-auto"
-#define BB_GUN_RECEIVER_AUTOMATIC "full auto"
-#define BB_GUN_RECEIVER_RIFLE "bolt action"
-#define BB_GUN_RECEIVER_CARBINE "pump action"
+#define BB_GUN_RECEIVER_AUTOMATIC "automatic"
+#define BB_GUN_RECEIVER_RIFLE "rifle"
+#define BB_GUN_RECEIVER_CARBINE "carbine"
 
 /**
  * Blood Brother gun parts.
@@ -54,16 +54,16 @@
 
 /obj/item/blood_brother_gun_part/receiver
 	name = "receiver"
-	desc = "An improvised receiver that determines how a weapon cycles between shots."
+	desc = "An improvised receiver that determines a weapon's firing characteristics."
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_RECEIVER
 	var/bb_receiver_type = BB_GUN_RECEIVER_SEMI_AUTO
-	/// Multiplier applied to projectile damage when this mechanism is installed.
+	/// Multiplier applied to projectile damage when this receiver is installed.
 	var/bb_damage_multiplier = 1
 	/// Multiplier applied to projectile speed when this mechanism is installed.
 	var/bb_projectile_speed_multiplier = 1
-	/// Firing interval for this mechanism. Used as the gun's delay between shots.
+	/// Firing interval for this receiver. Used as the gun's delay between shots.
 	var/bb_fire_interval
 
 /obj/item/blood_brother_gun_part/receiver/semi_auto
