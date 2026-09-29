@@ -58,7 +58,7 @@
 	icon = /obj/item/firing_pin::icon
 	icon_state = /obj/item/firing_pin::icon_state
 	bb_part_slot = BB_GUN_PART_FIRING_MECHANISM
-	var/bb_firing_mode = BB_GUN_RECEIVER_SEMI_AUTO
+	var/bb_receiver_type = BB_GUN_RECEIVER_SEMI_AUTO
 	/// Multiplier applied to projectile damage when this mechanism is installed.
 	var/bb_damage_multiplier = 1
 	/// Multiplier applied to projectile speed when this mechanism is installed.
@@ -68,25 +68,25 @@
 
 /obj/item/blood_brother_gun_part/receiver/semi_auto
 	name = "semi-auto receiver"
-	bb_firing_mode = BB_GUN_RECEIVER_SEMI_AUTO
+	bb_receiver_type = BB_GUN_RECEIVER_SEMI_AUTO
 
 /obj/item/blood_brother_gun_part/receiver/automatic
 	name = "automatic receiver"
-	bb_firing_mode = BB_GUN_RECEIVER_AUTOMATIC
+	bb_receiver_type = BB_GUN_RECEIVER_AUTOMATIC
 	bb_damage_multiplier = 1
 	bb_projectile_speed_multiplier = 1
 	bb_fire_interval = 0.2 SECONDS
 
 /obj/item/blood_brother_gun_part/receiver/rifle
 	name = "rifle receiver"
-	bb_firing_mode = BB_GUN_RECEIVER_RIFLE
+	bb_receiver_type = BB_GUN_RECEIVER_RIFLE
 	bb_damage_multiplier = 1.2
 	bb_projectile_speed_multiplier = 1.2
 	bb_fire_interval = 1.2 SECONDS
 
 /obj/item/blood_brother_gun_part/receiver/carbine
 	name = "carbine receiver"
-	bb_firing_mode = BB_GUN_RECEIVER_CARBINE
+	bb_receiver_type = BB_GUN_RECEIVER_CARBINE
 	bb_damage_multiplier = 1.1
 	bb_projectile_speed_multiplier = 1.1
 	bb_fire_interval = 1 SECONDS
