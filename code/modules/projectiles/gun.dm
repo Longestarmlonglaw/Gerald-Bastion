@@ -88,7 +88,6 @@
 	var/list/bb_installed_parts = list()
 	/// Weapon family used for Blood Brother part compatibility.
 	var/bb_weapon_family = null
-	/// Original ballistic action settings, restored when the firing mechanism is removed or changed to semi/full auto.
 	/// Original firing delay restored when the receiver is removed or changed.
 	var/bb_original_fire_delay
 
@@ -631,7 +630,12 @@
 	update_appearance()
 	return TRUE
 
-/obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)E
+/obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
+	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
+		if(user)
+			balloon_alert(user, "receiver missing")
+		return FALSE
+
 	if(user)
 		SEND_SIGNAL(user, COMSIG_MOB_FIRED_GUN, src, target, params, zone_override)
 
@@ -671,10 +675,10 @@
 					return
 			sprd = round((rand(0, 1) - 0.5) * DUALWIELD_PENALTY_EXTRA_MULTIPLIER * (randomized_gun_spread + randomized_bonus_spread))
 			before_firing(target,user)
-			var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
-			if(mechanism && chambered.loaded_projectile)
-				chambered.loaded_projectile.damage *= mechanism.bb_damage_multiplier
-				chambered.loaded_projectile.speed *= mechanism.bb_projectile_speed_multiplier
+			var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+			if(receiver && chambered.loaded_projectile)
+				chambered.loaded_projectile.damage *= receiver.bb_damage_multiplier
+				chambered.loaded_projectile.speed *= receiver.bb_projectile_speed_multiplier
 			if(!chambered.fire_casing(target, user, params, , suppressed, zone_override, sprd, src))
 				shoot_with_empty_chamber(user)
 				return
