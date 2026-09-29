@@ -117,8 +117,8 @@
 
 	blood_brother_part.forceMove(src)
 	bb_installed_parts[part_slot] = blood_brother_part
-	if(part_slot == BB_GUN_PART_FIRING_MECHANISM)
-		bb_update_firing_mechanism()
+	if(part_slot == BB_GUN_PART_RECEIVER)
+		bb_update_receiver()
 	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
 	update_appearance()
 	return TRUE
@@ -132,8 +132,8 @@
 			return TRUE
 	return FALSE
 
-/obj/item/gun/proc/bb_update_firing_mechanism()
-	var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+/obj/item/gun/proc/bb_update_receiver()
+	var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_RECEIVER)
 
 	if(isnull(bb_original_fire_delay))
 		bb_original_fire_delay = fire_delay
@@ -150,10 +150,6 @@
 		AddComponent(/datum/component/automatic_fire, receiver.bb_fire_interval)
 	else if(automatic_fire)
 		qdel(automatic_fire)
-
-/obj/item/gun/proc/bb_get_receiver_type()
-	var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
-	return receiver?.bb_receiver_type
 
 /obj/item/gun/proc/bb_get_part(bb_part_slot)
 	if(!bb_installed_parts)
@@ -185,8 +181,8 @@
 	if(!user.put_in_hands(part))
 		part.forceMove(drop_location())
 
-	if(slot == BB_GUN_PART_FIRING_MECHANISM)
-		bb_update_firing_mechanism()
+	if(slot == BB_GUN_PART_RECEIVER)
+		bb_update_receiver()
 	to_chat(user, span_notice("You remove [part] from [src]."))
 	update_appearance()
 	return TRUE
@@ -631,7 +627,7 @@
 	return TRUE
 
 /obj/item/gun/proc/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
-	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_FIRING_MECHANISM))
+	if(bb_part_slots.len && !bb_has_part(BB_GUN_PART_RECEIVER))
 		if(user)
 			balloon_alert(user, "receiver missing")
 		return FALSE
@@ -675,7 +671,7 @@
 					return
 			sprd = round((rand(0, 1) - 0.5) * DUALWIELD_PENALTY_EXTRA_MULTIPLIER * (randomized_gun_spread + randomized_bonus_spread))
 			before_firing(target,user)
-			var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+			var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_RECEIVER)
 			if(receiver && chambered.loaded_projectile)
 				chambered.loaded_projectile.damage *= receiver.bb_damage_multiplier
 				chambered.loaded_projectile.speed *= receiver.bb_projectile_speed_multiplier
