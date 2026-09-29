@@ -132,7 +132,7 @@
 
 /datum/crafting_recipe/blood_brother/semi_auto_receiver_part
 	name = "Semi-Auto Receiver"
-	desc = "An improvised semi-automatic firing mechanism."
+	desc = "An improvised semi-automatic receiver."
 	category = CAT_BB_PARTS
 	result = /obj/item/blood_brother_gun_part/receiver/semi_auto
 	reqs = list(
@@ -141,7 +141,7 @@
 
 /datum/crafting_recipe/blood_brother/automatic_receiver_part
 	name = "Automatic Receiver"
-	desc = "An improvised automatic firing mechanism."
+	desc = "An improvised automatic receiver."
 	category = CAT_BB_PARTS
 	result = /obj/item/blood_brother_gun_part/receiver/automatic
 	reqs = list(
@@ -150,7 +150,7 @@
 
 /datum/crafting_recipe/blood_brother/rifle_receiver_part
 	name = "Rifle Receiver"
-	desc = "An improvised bolt-action firing mechanism."
+	desc = "An improvised rifle receiver."
 	category = CAT_BB_PARTS
 	result = /obj/item/blood_brother_gun_part/receiver/rifle
 	reqs = list(
@@ -159,7 +159,7 @@
 
 /datum/crafting_recipe/blood_brother/carbine_receiver_part
 	name = "Carbine Receiver"
-	desc = "An improvised pump-action firing mechanism."
+	desc = "An improvised carbine receiver."
 	category = CAT_BB_PARTS
 	result = /obj/item/blood_brother_gun_part/receiver/carbine
 	reqs = list(
