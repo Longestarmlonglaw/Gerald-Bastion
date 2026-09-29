@@ -27,7 +27,7 @@
 	bb_weapon_family = BB_GUN_BALLISTIC
 	bb_part_slots = list(
 		BB_GUN_PART_MAGAZINE,
-		BB_GUN_PART_FIRING_MECHANISM,
+		BB_GUN_PART_RECEIVER,
 		BB_GUN_PART_BARREL,
 		BB_GUN_PART_UNDERBARREL,
 	)
@@ -105,6 +105,6 @@
 	. = ..()
 	if(!bb_installed_parts)
 		bb_installed_parts = list()
-	var/obj/item/blood_brother_gun_part/firing_mechanism/semi_auto/mechanism = new(src)
-	bb_installed_parts[BB_GUN_PART_FIRING_MECHANISM] = mechanism
-	bb_update_firing_mechanism()
+	var/obj/item/blood_brother_gun_part/receiver/semi_auto/mechanism = new(src)
+	bb_installed_parts[BB_GUN_PART_RECEIVER] = mechanism
+	bb_update_receiver()
