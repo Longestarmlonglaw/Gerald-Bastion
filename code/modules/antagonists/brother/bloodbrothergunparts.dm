@@ -33,13 +33,13 @@
 		return NONE
 
 	var/obj/item/gun/targeted_gun = interacting_with
+	if(!bb_part_slot || !(bb_part_slot in targeted_gun.bb_part_slots))
+		balloon_alert(user, "incompatible part!")
+		return ITEM_INTERACT_BLOCKING
+	if(bb_weapon_family && bb_weapon_family != targeted_gun.bb_weapon_family)
+		balloon_alert(user, "wrong weapon type!")
+		return ITEM_INTERACT_BLOCKING
 	if(!targeted_gun.bb_install_part(src, user))
-		if(!bb_part_slot || !(bb_part_slot in targeted_gun.bb_part_slots))
-			balloon_alert(user, "incompatible part!")
-		else if(bb_weapon_family && bb_weapon_family != targeted_gun.bb_weapon_family)
-			balloon_alert(user, "wrong weapon type!")
-		else
-			balloon_alert(user, "can't install part!")
 		return ITEM_INTERACT_BLOCKING
 
 	return ITEM_INTERACT_SUCCESS
