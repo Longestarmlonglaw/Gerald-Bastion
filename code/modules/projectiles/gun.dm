@@ -153,8 +153,8 @@
 		qdel(automatic_fire)
 
 /obj/item/gun/proc/bb_get_receiver_type()
-	var/obj/item/blood_brother_gun_part/firing_mechanism/mechanism = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
-	return mechanism?.bb_firing_mode
+	var/obj/item/blood_brother_gun_part/receiver/receiver = bb_get_part(BB_GUN_PART_FIRING_MECHANISM)
+	return receiver?.bb_firing_mode
 
 /obj/item/gun/proc/bb_get_part(bb_part_slot)
 	if(!bb_installed_parts)
@@ -483,7 +483,7 @@
 		return TRUE
 	return fire_gun(target, user, user.Adjacent(target), params)
 
-/obj/item/gun/proc/fire_gun(atom/target, mob/living/user, flag, params)E
+/obj/item/gun/proc/fire_gun(atom/target, mob/living/user, flag, params)
 	if(QDELETED(target))
 		return
 	if(firing_burst)
