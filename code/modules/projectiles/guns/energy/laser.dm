@@ -299,7 +299,7 @@
 /obj/item/gun/energy/laser/hardlight/Initialize(mapload)
 	. = ..()
 	var/obj/item/blood_brother_gun_part/receiver/default_receiver = new /obj/item/blood_brother_gun_part/receiver/rifle(src)
-	bb_installed_parts[BB_GUN_PART_RECEIVER] = default_mechanism
+	bb_installed_parts[BB_GUN_PART_RECEIVER] = default_receiver
 	bb_update_receiver()
 
 /obj/item/ammo_casing/energy/laser/hardlight
