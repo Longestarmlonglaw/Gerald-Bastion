@@ -298,7 +298,7 @@
 
 /obj/item/gun/energy/laser/hardlight/Initialize(mapload)
 	. = ..()
-	var/obj/item/blood_brother_gun_part/firing_mechanism/default_mechanism = new /obj/item/blood_brother_gun_part/receiver/rifle(src)
+	var/obj/item/blood_brother_gun_part/receiver/default_receiver = new /obj/item/blood_brother_gun_part/receiver/rifle(src)
 	bb_installed_parts[BB_GUN_PART_FIRING_MECHANISM] = default_mechanism
 	bb_update_firing_mechanism()
 
