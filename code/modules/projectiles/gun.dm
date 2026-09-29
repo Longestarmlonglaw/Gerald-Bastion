@@ -92,20 +92,22 @@
 	var/bb_original_fire_delay
 
 /obj/item/gun/proc/bb_part_requires_empty(slot)
-	if(slot != BB_GUN_PART_POWER_CELL)
-		return TRUE
-	return istype(src, /obj/item/gun/energy)
+	if(istype(src, /obj/item/gun/energy))
+		return slot == BB_GUN_PART_POWER_CELL
+	return TRUE
 
 /obj/item/gun/proc/bb_can_modify_part(slot, mob/living/user)
-	if(bb_part_requires_empty(slot) && bb_parts_loaded())
+	if(istype(src, /obj/item/gun/energy))
+		if(slot == BB_GUN_PART_POWER_CELL)
+			var/obj/item/gun/energy/energy_gun = src
+			if(energy_gun.cell?.charge > 0)
+				balloon_alert(user, "power cell must be empty")
+				return FALSE
+		return TRUE
+
+	if(bb_parts_loaded())
 		balloon_alert(user, "cannot modify, unload first")
 		return FALSE
-
-	if(slot == BB_GUN_PART_POWER_CELL && istype(src, /obj/item/gun/energy))
-		var/obj/item/gun/energy/energy_gun = src
-		if(energy_gun.cell?.charge > 0)
-			balloon_alert(user, "power cell must be empty")
-			return FALSE
 
 	return TRUE
 
