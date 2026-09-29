@@ -94,9 +94,6 @@
 /obj/item/gun/proc/bb_can_modify_part(slot, mob/living/user)
 	if(istype(src, /obj/item/gun/energy))
 		if(slot == BB_GUN_PART_POWER_CELL)
-			if(chambered?.loaded_projectile)
-				balloon_alert(user, "cannot modify, unload first")
-				return FALSE
 			return TRUE
 
 	if(bb_parts_loaded())
@@ -130,6 +127,9 @@
 
 	blood_brother_part.forceMove(src)
 	bb_installed_parts[part_slot] = blood_brother_part
+	if(part_slot == BB_GUN_PART_POWER_CELL)
+		var/obj/item/gun/energy/energy_gun = src
+		energy_gun.cell.charge = 0
 	if(part_slot == BB_GUN_PART_RECEIVER)
 		bb_update_receiver()
 	to_chat(user, span_notice("You install [blood_brother_part] into [src]."))
@@ -193,6 +193,9 @@
 	if(!user.put_in_hands(part))
 		part.forceMove(drop_location())
 
+	if(slot == BB_GUN_PART_POWER_CELL)
+		var/obj/item/gun/energy/energy_gun = src
+		energy_gun.cell.charge = 0
 	if(slot == BB_GUN_PART_RECEIVER)
 		bb_update_receiver()
 	to_chat(user, span_notice("You remove [part] from [src]."))
