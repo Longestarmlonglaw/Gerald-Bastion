@@ -91,12 +91,29 @@
 	/// Original firing delay restored when the receiver is removed or changed.
 	var/bb_original_fire_delay
 
-/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
-	if(bb_parts_loaded())
+/obj/item/gun/proc/bb_part_requires_empty(slot)
+	if(slot != BB_GUN_PART_POWER_CELL)
+		return TRUE
+	return istype(src, /obj/item/gun/energy)
+
+/obj/item/gun/proc/bb_can_modify_part(slot, mob/living/user)
+	if(bb_part_requires_empty(slot) && bb_parts_loaded())
 		balloon_alert(user, "cannot modify, unload first")
 		return FALSE
 
+	if(slot == BB_GUN_PART_POWER_CELL && istype(src, /obj/item/gun/energy))
+		var/obj/item/gun/energy/energy_gun = src
+		if(energy_gun.cell?.charge > 0)
+			balloon_alert(user, "power cell must be empty")
+			return FALSE
+
+	return TRUE
+
+/obj/item/gun/proc/bb_install_part(obj/item/blood_brother_part, mob/living/user)
 	var/part_slot = blood_brother_part?.vars["bb_part_slot"]
+	if(!bb_can_modify_part(part_slot, user))
+		return FALSE
+
 	var/part_family = blood_brother_part?.vars["bb_weapon_family"]
 
 	if(!part_slot || !(part_slot in bb_part_slots))
@@ -167,8 +184,7 @@
 	return installed
 
 /obj/item/gun/proc/bb_remove_part(mob/living/user, slot)
-	if(bb_parts_loaded())
-		balloon_alert(user, "cannot modify, unload first")
+	if(!bb_can_modify_part(slot, user))
 		return FALSE
 	if(!bb_installed_parts)
 		return FALSE
@@ -188,9 +204,6 @@
 	return TRUE
 
 /obj/item/gun/proc/bb_alt_right_click_remove_part(mob/user)
-	if(bb_parts_loaded())
-		balloon_alert(user, "cannot modify, unload first")
-		return FALSE
 	if(!bb_part_slots.len || !user)
 		return FALSE
 
