@@ -1,13 +1,23 @@
-/** 
+/**
  * Electrified Blood Brother bola.
- *
- * Uses the normal bola sprite for now as a placeholder.
  */
 
 /obj/item/restraints/legcuffs/bola/electrified
 	name = "electrified bola"
 	desc = "A bola modified to deliver a sustained electrical shock to whoever it ensnares."
-	// Placeholder: intentionally inherits the regular bola sprite.
+	icon_state = "bola_electrified"
+	icon_state_preview = null
+	inhand_icon_state = "bola_electrified"
+
+/obj/item/restraints/legcuffs/bola/electrified/throw_at(atom/target, range, speed, mob/thrower, spin=1, diagonals_first = 0, datum/callback/callback, gentle = FALSE, quickstart = TRUE)
+	icon_state = "bola_electrified_thrown"
+	. = ..()
+	if(!throwing)
+		icon_state = initial(icon_state)
+
+/obj/item/restraints/legcuffs/bola/electrified/throw_impact(atom/hit_atom, datum/thrownthing/throwingdatum)
+	icon_state = initial(icon_state)
+	return ..()
 
 /obj/item/restraints/legcuffs/bola/electrified/ensnare(mob/living/carbon/C)
 	. = ..()
