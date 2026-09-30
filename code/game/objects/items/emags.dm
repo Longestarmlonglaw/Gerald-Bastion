@@ -39,7 +39,7 @@
 
 /obj/item/card/emag/improvised/can_emag(atom/target, mob/user)
 	if(ismob(target) || istype(target, /obj/structure/chair))
-		to_chat(user, span_warning("The [src] cannot interface with [target]."))
+		to_chat(user, span_warning("[src] cannot interface with [target]."))
 		return FALSE
 	return ..()
 
@@ -67,22 +67,29 @@
 
 	if(prob(5))
 		user.adjust_fire_stacks(1)
+		user.ignite_mob()
 		to_chat(user, span_danger("The card shorts out and catches fire in your hands!"))
 
 	if(!emag_target(interacting_with, user))
 		charges++
-		to_chat(user, span_notice("The [src] fails to emag [interacting_with]!"))
+		to_chat(user, span_notice("[src] fails to emag [interacting_with]!"))
 
 	emagging = FALSE
 	return ITEM_INTERACT_SUCCESS
 
-/obj/item/card/emag/improvised/attackby(obj/item/W, mob/user, params)
-	. = ..()
-	if(max_charges > charges && istype(W, /obj/item/stack/sheet/mineral/uranium))
-		var/obj/item/stack/sheet/mineral/uranium/uranium = W
-		uranium.use(1)
-		charges++
-		to_chat(user, span_notice("You add another charge to [src]. It now has [charges] use[charges == 1 ? "" : "s"] remaining."))
+/obj/item/card/emag/improvised/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!istype(tool, /obj/item/stack/sheet/mineral/uranium))
+		return NONE
+	if(charges >= max_charges)
+		balloon_alert(user, "already full!")
+		return ITEM_INTERACT_BLOCKING
+
+	var/obj/item/stack/sheet/mineral/uranium/uranium = tool
+	if(!uranium.use(1))
+		return ITEM_INTERACT_BLOCKING
+	charges++
+	to_chat(user, span_notice("You add another charge to [src]. It now has [charges] use[charges == 1 ? "" : "s"] remaining."))
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/card/emag/improvised/examine(mob/user)
 	. = ..()

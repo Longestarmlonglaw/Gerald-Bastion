@@ -1,32 +1,16 @@
 /datum/component/personal_crafting/blood_brother
 	forced_mode = TRUE
-	var/list/blood_brother_recipes
+	/// Every Blood Brother recipe, shared between all instances of this component.
+	var/static/list/blood_brother_recipes
 
 /datum/component/personal_crafting/blood_brother/Initialize()
-	blood_brother_recipes = list(
-		new /datum/crafting_recipe/blood_brother/sanguine_lantern,
-		new /datum/crafting_recipe/blood_brother/brotherly_token,
-		new /datum/crafting_recipe/blood_brother/blood_bond,
-		new /datum/crafting_recipe/blood_brother/brotherly_weapon,
-		new /datum/crafting_recipe/blood_brother/brotherly_ammunition,
-		new /datum/crafting_recipe/blood_brother/brotherly_gadget,
-		new /datum/crafting_recipe/blood_brother/brotherly_explosive,
-		new /datum/crafting_recipe/blood_brother/magazine_part,
-		new /datum/crafting_recipe/blood_brother/semi_auto_receiver_part,
-		new /datum/crafting_recipe/blood_brother/automatic_receiver_part,
-		new /datum/crafting_recipe/blood_brother/rifle_receiver_part,
-		new /datum/crafting_recipe/blood_brother/carbine_receiver_part,
-		new /datum/crafting_recipe/blood_brother/barrel_part,
-		new /datum/crafting_recipe/blood_brother/power_cell_part,
-		new /datum/crafting_recipe/blood_brother/lens_part,
-		new /datum/crafting_recipe/blood_brother/underbarrel_part,
-		new /datum/crafting_recipe/blood_brother/brotherly_implant,
-		new /datum/crafting_recipe/blood_brother/electrified_bola,
-		new /datum/crafting_recipe/blood_brother/scrap_revolver,
-		new /datum/crafting_recipe/blood_brother/hardlight_laser_cannon,
-		new /datum/crafting_recipe/blood_brother/makeshift_emag,
-	)
-	return
+	// Deliberately skips the parent, which would add a second crafting button to the mob's HUD.
+	if(blood_brother_recipes)
+		return
+	blood_brother_recipes = list()
+	for(var/datum/crafting_recipe/recipe as anything in GLOB.crafting_recipes)
+		if(recipe.blood_brother_only)
+			blood_brother_recipes += recipe
 
 /datum/component/personal_crafting/blood_brother/can_use_special_recipes(mob/user)
 	return IS_BROTHER(user)
@@ -80,7 +64,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/cloth = 1,
 		/obj/item/food/meat/slab = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/brotherly_weapon
 	name = "Brotherly Weapon"
@@ -89,7 +73,7 @@
 	result = /obj/item/knife
 	reqs = list(
 		/obj/item/stack/sheet/iron = 2,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/brotherly_ammunition
 	name = "Brotherly Ammunition"
@@ -99,7 +83,7 @@
 	result_amount = 2
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/brotherly_gadget
 	name = "Brotherly Gadget"
@@ -109,7 +93,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/cable_coil = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/brotherly_explosive
 	name = "Brotherly Explosive"
@@ -119,7 +103,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/cable_coil = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/magazine_part
 	name = "Magazine"
@@ -128,7 +112,7 @@
 	result = /obj/item/blood_brother_gun_part/magazine
 	reqs = list(
 		/obj/item/stock_parts/matter_bin = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/semi_auto_receiver_part
 	name = "Semi-Auto Receiver"
@@ -137,7 +121,7 @@
 	result = /obj/item/blood_brother_gun_part/receiver/semi_auto
 	reqs = list(
 		/obj/item/firing_pin = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/automatic_receiver_part
 	name = "Automatic Receiver"
@@ -146,7 +130,7 @@
 	result = /obj/item/blood_brother_gun_part/receiver/automatic
 	reqs = list(
 		/obj/item/firing_pin = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/rifle_receiver_part
 	name = "Rifle Receiver"
@@ -155,7 +139,7 @@
 	result = /obj/item/blood_brother_gun_part/receiver/rifle
 	reqs = list(
 		/obj/item/firing_pin = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/carbine_receiver_part
 	name = "Carbine Receiver"
@@ -164,7 +148,7 @@
 	result = /obj/item/blood_brother_gun_part/receiver/carbine
 	reqs = list(
 		/obj/item/firing_pin = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/barrel_part
 	name = "Barrel"
@@ -173,7 +157,7 @@
 	result = /obj/item/blood_brother_gun_part/barrel
 	reqs = list(
 		/obj/item/pipe = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/power_cell_part
 	name = "Power Cell"
@@ -182,7 +166,7 @@
 	result = /obj/item/blood_brother_gun_part/power_cell
 	reqs = list(
 		/obj/item/stock_parts/power_store/cell = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/lens_part
 	name = "Lens"
@@ -191,7 +175,7 @@
 	result = /obj/item/blood_brother_gun_part/lens
 	reqs = list(
 		/obj/item/stock_parts/scanning_module = 1,
-)
+	)
 
 /datum/crafting_recipe/blood_brother/underbarrel_part
 	name = "Underbarrel"
@@ -210,8 +194,7 @@
 	reqs = list(
 		/obj/item/stack/sheet/iron = 1,
 		/obj/item/stack/sheet/glass = 1,
-)
-
+	)
 
 /datum/crafting_recipe/blood_brother/electrified_bola
 	name = "Electrified Bola"
@@ -238,8 +221,6 @@
 		return FALSE
 
 	return ..()
-
-
 
 /datum/crafting_recipe/blood_brother/makeshift_emag
 	name = "Improvised Emag"
@@ -276,7 +257,6 @@
 	tool_paths = list(
 		/obj/item/surgicaldrill,
 	)
-
 
 /datum/crafting_recipe/blood_brother/hardlight_laser_cannon
 	name = "Hardlight Laser Cannon"

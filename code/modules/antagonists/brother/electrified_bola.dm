@@ -38,7 +38,8 @@
 	to_chat(owner, span_userdanger("The electrified bola shocks you! Get it off quickly!"))
 
 /datum/status_effect/electrified_bola/tick(seconds_between_ticks)
-	if(QDELETED(source_bola) || !istype(owner, /mob/living/carbon) || owner:legcuffed != source_bola)
+	var/mob/living/carbon/carbon_owner = owner
+	if(QDELETED(source_bola) || !istype(carbon_owner) || carbon_owner.legcuffed != source_bola)
 		qdel(src)
 		return
 

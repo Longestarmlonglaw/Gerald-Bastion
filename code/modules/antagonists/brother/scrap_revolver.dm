@@ -24,13 +24,6 @@
 		stored_ammo += null
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap
-	bb_weapon_family = BB_GUN_BALLISTIC
-	bb_part_slots = list(
-		BB_GUN_PART_MAGAZINE,
-		BB_GUN_PART_RECEIVER,
-		BB_GUN_PART_BARREL,
-		BB_GUN_PART_UNDERBARREL,
-	)
 	name = "scrap revolver"
 	desc = "A crude revolver cobbled together from whatever parts were available. Its matter-bin cylinder can be configured for .38 rounds or 12 gauge shells."
 	icon_state = "c38"
@@ -55,7 +48,7 @@
 		balloon_alert(user, "hold to modify!")
 		return TRUE
 
-	//  unload your gun, dipshit
+	// Wrenching the cylinder with live rounds loaded sets one off.
 	if(get_ammo(FALSE, FALSE))
 		if(!chambered)
 			chamber_round()
@@ -89,22 +82,21 @@
 		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
 
-	// A mode switch is only possible with no live rounds. Keep the cylinder's
-	// chamber slots in sync with its current capacity and dump excess casings.
-	while(cylinder.stored_ammo.len > cylinder.max_ammo)
-		var/obj/item/ammo_casing/excess_casing = cylinder.stored_ammo[cylinder.stored_ammo.len]
-		cylinder.stored_ammo.len--
-		if(excess_casing)
-			excess_casing.forceMove(drop_location())
-	while(cylinder.stored_ammo.len < cylinder.max_ammo)
+	// A mode switch is only possible with no live rounds, so anything left in the cylinder
+	// is a spent casing of the old caliber. Dump them all and resize the cylinder's chambers.
+	var/list/spent_casings = cylinder.ammo_list()
+	cylinder.stored_ammo = list()
+	for(var/i in 1 to cylinder.max_ammo)
 		cylinder.stored_ammo += null
+	for(var/obj/item/ammo_casing/spent_casing as anything in spent_casings)
+		spent_casing.forceMove(drop_location())
 	cylinder.update_appearance()
 	update_appearance()
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap/Initialize(mapload)
 	. = ..()
-	if(!bb_installed_parts)
-		bb_installed_parts = list()
-	var/obj/item/blood_brother_gun_part/receiver/semi_auto/mechanism = new(src)
-	bb_installed_parts[BB_GUN_PART_RECEIVER] = mechanism
-	bb_update_receiver()
+	AddComponent(/datum/component/blood_brother_gun, \
+		weapon_family = BB_GUN_BALLISTIC, \
+		part_slots = list(BB_GUN_PART_MAGAZINE, BB_GUN_PART_RECEIVER, BB_GUN_PART_BARREL, BB_GUN_PART_UNDERBARREL), \
+		default_parts = list(/obj/item/blood_brother_gun_part/receiver/semi_auto), \
+	)
