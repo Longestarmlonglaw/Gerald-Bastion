@@ -1,7 +1,6 @@
 /**
  * Scrap revolver for Blood Brothers.
  *
- * Uses the regular .38 revolver sprites as a placeholder.
  * Its improvised cylinder can be configured between .38 and 12 gauge ammunition.
  */
 
@@ -26,7 +25,8 @@
 /obj/item/gun/ballistic/revolver/blood_brother_scrap
 	name = "scrap revolver"
 	desc = "A crude revolver cobbled together from whatever parts were available. Its matter-bin cylinder can be configured for .38 rounds or 12 gauge shells."
-	icon_state = "c38"
+	icon_state = "scrap_revolver"
+	base_icon_state = "scrap_revolver"
 	inhand_icon_state = "gun"
 	accepted_magazine_type = /obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap
 	fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
@@ -73,12 +73,14 @@
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
 		cylinder.max_ammo = 3
+		base_icon_state = "scrap_revolver_shotgun"
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
 		cylinder.ammo_type = /obj/item/ammo_casing/c38
 		cylinder.caliber = CALIBER_38
 		cylinder.max_ammo = 6
+		base_icon_state = "scrap_revolver"
 		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
 
