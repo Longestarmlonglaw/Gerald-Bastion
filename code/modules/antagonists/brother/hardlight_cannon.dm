@@ -24,16 +24,19 @@
 /obj/item/ammo_casing/energy/laser/hardlight
 	projectile_type = /obj/projectile/beam/laser/hardlight_cannon
 	fire_sound = 'sound/weapons/lasercannonfire.ogg'
-	firing_effect_type = null
+	firing_effect_type = /obj/effect/temp_visual/dir_setting/firing_effect/blue
 	delay = 1 SECONDS
 
 /obj/projectile/beam/laser/hardlight_cannon
 	name = "hardlight laser"
+	icon_state = "hardlight_cannon"
 	pass_flags = PASSTABLE
 	damage = 24
 	damage_type = BURN
 	range = 8
 	eyeblur = 2 SECONDS
+	impact_effect_type = /obj/effect/temp_visual/impact_effect/blue_laser
+	light_color = LIGHT_COLOR_BLUE
 
 /obj/projectile/beam/laser/hardlight_cannon/on_hit(atom/target, blocked = 0, pierce_hit)
 	. = ..()
