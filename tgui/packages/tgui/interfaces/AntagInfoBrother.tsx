@@ -319,6 +319,47 @@ const GUIDE_TOPICS: GuideTopic[] = [
     ),
   },
   {
+    title: 'Getting Started',
+    icon: 'flag',
+    content: (
+      <>
+        <Box bold fontSize="14px" color="red" mb={0.5}>
+          If you started the round as a blood brother...
+        </Box>
+        <Box mb={1}>
+          You're on your own for now. You start with a <b>flash</b>, and your
+          first job is to recruit a brother with it. See the <b>Recruiting</b>{' '}
+          topic.
+        </Box>
+        <Box mb={1}>
+          Choose carefully. Once you recruit someone, you can't recruit anyone
+          else, so pick someone you can trust and who can help with your
+          objectives.
+        </Box>
+        <Box mb={2}>
+          Until then, scout your targets and gather crafting materials. Your
+          recruit will need you to fill them in.
+        </Box>
+        <Box bold fontSize="14px" color="red" mb={0.5}>
+          If you were flashed and are reading this...
+        </Box>
+        <Box mb={1}>
+          Welcome to the bond. The person who flashed you is now your brother,
+          and you share their objectives. Their goals are your goals now.
+        </Box>
+        <Box mb={1}>
+          Say hello with the <b>Blood Bond</b> action. Your brother has probably
+          been planning for a while, so ask them what they need from you.
+        </Box>
+        <Box>
+          You usually won't get a flash of your own, but now and then the
+          Syndicate expects more from a recruit and grants an extra one. If that
+          happens, you can recruit another brother too.
+        </Box>
+      </>
+    ),
+  },
+  {
     title: 'Recruiting',
     icon: 'user-plus',
     content: (
