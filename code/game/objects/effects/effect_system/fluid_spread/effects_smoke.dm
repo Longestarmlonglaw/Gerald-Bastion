@@ -213,6 +213,8 @@
 	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/effect/particle_effect/fluid/smoke/bad/smoke_mob(mob/living/carbon/smoker)
+	if(HAS_TRAIT(smoker, TRAIT_SMOKE_COUGH_IMMUNE))
+		return FALSE
 	. = ..()
 	if(!.)
 		return

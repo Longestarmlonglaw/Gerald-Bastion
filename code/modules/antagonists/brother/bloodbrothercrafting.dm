@@ -135,6 +135,17 @@
 	// Accept either cyborg arm, but never any other kind of arm.
 	blacklist |= typesof(/obj/item/bodypart/arm) - typesof(/obj/item/bodypart/arm/left/robot) - typesof(/obj/item/bodypart/arm/right/robot)
 
+/datum/crafting_recipe/blood_brother/smokebomb_lungs
+	name = "Smokebomb Lungs"
+	desc = "A pair of lungs packed with smoke powder, letting you exhale a cloud of choking smoke on demand. You'll be immune to the coughing, but not the blindness."
+	category = CAT_BB_IMPLANTS
+	result = /obj/item/organ/internal/lungs/smokebomb
+	reqs = list(
+		/obj/item/organ/internal/lungs = 1,
+		/datum/reagent/smoke_powder = 15,
+	)
+	time = 10 SECONDS
+
 /datum/crafting_recipe/blood_brother/electrified_bola
 	name = "Electrified Bola"
 	desc = "A modified bola wired to deliver a sustained electrical shock."
