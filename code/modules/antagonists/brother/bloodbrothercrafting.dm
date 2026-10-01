@@ -18,18 +18,15 @@
 /datum/component/personal_crafting/blood_brother/get_crafting_recipes()
 	return blood_brother_recipes
 
-/datum/component/personal_crafting/blood_brother/get_ui_title()
-	return "Blood Brother Crafting"
-
 /datum/component/personal_crafting/blood_brother/is_recipe_available(datum/crafting_recipe/recipe, mob/user)
 	if(!IS_BROTHER(user))
 		return FALSE
 	return ..()
 
+/// Blood Brother crafting has no window of its own, it is shown in the crafting tab of the brother panel instead.
 /datum/component/personal_crafting/blood_brother/ui_interact(mob/user, datum/tgui/ui)
-	if(!IS_BROTHER(user))
-		return
-	return ..()
+	var/datum/antagonist/brother/bond = user?.mind?.has_antag_datum(/datum/antagonist/brother)
+	bond?.open_tab(BB_UI_TAB_CRAFTING)
 
 /datum/crafting_recipe/blood_brother
 	blood_brother_only = TRUE

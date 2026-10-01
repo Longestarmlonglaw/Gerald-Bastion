@@ -3399,7 +3399,6 @@
 #include "code\modules\antagonists\brother\scrap_revolver.dm"
 #include "code\modules\antagonists\brother\actions\_action.dm"
 #include "code\modules\antagonists\brother\actions\communicate.dm"
-#include "code\modules\antagonists\brother\actions\crafting.dm"
 #include "code\modules\antagonists\brother\actions\gear.dm"
 #include "code\modules\antagonists\brother\gear\_gear.dm"
 #include "code\modules\antagonists\brother\gear\misc.dm"

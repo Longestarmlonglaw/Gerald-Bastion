@@ -15,13 +15,14 @@
 	antag_count_points = 5 //duo antag
 	var/datum/action/bb/comms/comms_action
 	var/datum/action/bb/gear/gear_action
-	var/datum/action/bb/crafting/crafting_action
 	var/datum/component/personal_crafting/blood_brother/blood_brother_crafting
 	VAR_PRIVATE/datum/team/brother_team/team
 	///This is used to say who is the big and little brothers. 0 = big, 1 is the middle brother, 2 is little, 3 is little little
 	var/brotherRank = 0
 	///Whether the confirmation UI popup is active or not
 	var/popup = FALSE
+	///The tab currently open in the brother panel, as a BB_UI_TAB_* define.
+	var/ui_tab = BB_UI_TAB_OBJECTIVES
 
 /datum/antagonist/brother/create_team(datum/team/brother_team/new_team)
 	if(!new_team)
@@ -75,9 +76,6 @@
 	gear_action?.Grant(target)
 	if(QDELETED(blood_brother_crafting))
 		blood_brother_crafting = target.AddComponent(/datum/component/personal_crafting/blood_brother)
-	if(QDELETED(crafting_action))
-		crafting_action = new(src)
-	crafting_action.Grant(target)
 	add_team_hud(target, /datum/antagonist/brother, REF(team))
 
 /datum/antagonist/brother/remove_innate_effects(mob/living/mob_override)
@@ -86,8 +84,6 @@
 	QDEL_NULL(comms_action)
 	gear_action?.Remove(mob_override || owner.current)
 	QDEL_NULL(gear_action)
-	crafting_action?.Remove(mob_override || owner.current)
-	QDEL_NULL(crafting_action)
 	QDEL_NULL(blood_brother_crafting)
 
 /datum/antagonist/brother/antag_panel_data()
@@ -154,11 +150,103 @@
 	message_admins("[key_name_admin(admin)] made [key_name_admin(new_owner)] into a blood brother.")
 	log_admin("[key_name(admin)] made [key_name(new_owner)] into a blood brother.")
 
+/// Returns this brother's rank within the team, such as "Big Brother" or "Little Little Brother".
+/datum/antagonist/brother/proc/get_rank_title()
+	if(brotherRank <= 0)
+		return "Big Brother"
+	var/rank_title = ""
+	for(var/littleness in 2 to brotherRank)
+		rank_title += "Little "
+	return rank_title + "Brother"
+
+/// Opens the brother panel on the given tab, or switches an already open panel to it.
+/datum/antagonist/brother/proc/open_tab(tab)
+	if(tab in list(BB_UI_TAB_OBJECTIVES, BB_UI_TAB_CONSPIRATORS, BB_UI_TAB_CRAFTING, BB_UI_TAB_GUIDE))
+		ui_tab = tab
+	ui_interact(owner.current)
+
+/datum/antagonist/brother/ui_assets(mob/user)
+	return list(get_asset_datum(/datum/asset/spritesheet_batched/crafting))
+
 /datum/antagonist/brother/ui_static_data(mob/user)
 	var/list/data = list()
 	data["antag_name"] = name
 	data["objectives"] = get_objectives()
+	if(!QDELETED(blood_brother_crafting))
+		merge_ui_data(data, blood_brother_crafting.ui_static_data(user))
 	return data
+
+/datum/antagonist/brother/ui_data(mob/user)
+	var/list/data = list()
+	data["tab"] = ui_tab
+	data["rank"] = get_rank_title()
+	data["team_name"] = team?.name
+	data["conspirators"] = get_conspirator_data()
+	data["gear_chosen"] = team?.chosen_gear?.name
+	data["gear_summoned"] = team?.summoned_gear
+	// Checking what can be crafted scans everything around the user, so only do it while the crafting tab is open.
+	if(ui_tab == BB_UI_TAB_CRAFTING && !QDELETED(blood_brother_crafting))
+		merge_ui_data(data, blood_brother_crafting.ui_data(user))
+	return data
+
+/// Copies every key and value of the crafting component's UI data into ours, so the crafting tab can use it.
+/datum/antagonist/brother/proc/merge_ui_data(list/data, list/crafting_data)
+	for(var/key in crafting_data)
+		data[key] = crafting_data[key]
+
+/// Returns the name, rank and health of every member of the team, for the conspirators tab.
+/datum/antagonist/brother/proc/get_conspirator_data()
+	var/list/conspirators = list()
+	for(var/datum/mind/member as anything in team?.members)
+		var/datum/antagonist/brother/their_bond = member.has_antag_datum(/datum/antagonist/brother)
+		var/list/entry = list(
+			"ref" = REF(member),
+			"name" = member.name,
+			"rank" = their_bond?.get_rank_title(),
+			"job" = member.assigned_role?.title,
+			"is_you" = member == owner,
+		)
+		var/mob/living/body = member.current
+		if(!istype(body))
+			entry["status"] = "missing"
+		else
+			switch(body.stat)
+				if(CONSCIOUS)
+					entry["status"] = "conscious"
+				if(SOFT_CRIT, UNCONSCIOUS)
+					entry["status"] = "unconscious"
+				if(HARD_CRIT)
+					entry["status"] = "critical"
+				else
+					entry["status"] = "dead"
+			entry["health"] = body.health
+			entry["max_health"] = body.maxHealth
+			entry["brute"] = body.getBruteLoss()
+			entry["burn"] = body.getFireLoss()
+			entry["toxin"] = body.getToxLoss()
+			entry["oxygen"] = body.getOxyLoss()
+		conspirators += list(entry)
+	return conspirators
+
+/datum/antagonist/brother/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	. = ..()
+	if(. || isobserver(ui.user))
+		return
+	switch(action)
+		if("set_tab")
+			var/tab = params["tab"]
+			if(!(tab in list(BB_UI_TAB_OBJECTIVES, BB_UI_TAB_CONSPIRATORS, BB_UI_TAB_CRAFTING, BB_UI_TAB_GUIDE)))
+				return
+			ui_tab = tab
+			return TRUE
+		// Crafting actions are handed off to the crafting component, which the crafting tab displays.
+		if("make", "toggle_recipes", "toggle_compact")
+			if(QDELETED(blood_brother_crafting))
+				return
+			var/datum/ui_state/crafting_state = blood_brother_crafting.ui_state(ui.user)
+			if(crafting_state.can_use_topic(blood_brother_crafting, ui.user) < UI_INTERACTIVE)
+				return
+			return blood_brother_crafting.ui_act(action, params, ui, crafting_state)
 
 /datum/antagonist/brother/antag_token(datum/mind/hosts_mind, mob/spender)
 	var/datum/team/brother_team/team = new
@@ -178,13 +266,7 @@
 	if(!istext(message) || !length(message) || QDELETED(owner) || QDELETED(team))
 		return
 	owner.current.log_talk(html_decode(message), LOG_SAY, tag = "blood brother")
-	var/name_rank = "Big Brother"
-	if(brotherRank > 0)
-		name_rank = ""
-		for (var/littleness in 2 to brotherRank)
-			name_rank += "Little "
-		name_rank += "Brother"
-	var/formatted_msg = "<span class='[team.color]'><b><i>\[Blood Bond\]</i> [span_name("[name_rank]: [owner.name]")]</b>: [message]</span>"
+	var/formatted_msg = "<span class='[team.color]'><b><i>\[Blood Bond\]</i> [span_name("[get_rank_title()]: [owner.name]")]</b>: [message]</span>"
 	for(var/datum/mind/brother as anything in team.members)
 		var/mob/living/target = brother.current
 		if(QDELETED(target))

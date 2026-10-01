@@ -1,3 +1,9 @@
+// Blood Brother panel tabs
+#define BB_UI_TAB_OBJECTIVES "objectives"
+#define BB_UI_TAB_CONSPIRATORS "conspirators"
+#define BB_UI_TAB_CRAFTING "crafting"
+#define BB_UI_TAB_GUIDE "guide"
+
 // Blood Brother modular gun part slots
 #define BB_GUN_PART_MAGAZINE "magazine"
 #define BB_GUN_PART_RECEIVER "receiver"
