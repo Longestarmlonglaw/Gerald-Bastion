@@ -1,19 +1,17 @@
 /**
  * Hardlight laser cannon for Blood Brothers.
- *
- * Uses the regular laser cannon sprites as a placeholder.
  */
 
 /obj/item/gun/energy/laser/hardlight
 	name = "hardlight laser cannon"
 	desc = "A crude laser cannon that fires incredibly dense beams of hardlight. The beam is solid enough to be stopped by glass and grilles."
-	icon_state = "lasercannon"
+	icon_state = "hardlight_cannon"
+	// Left null so the inhand state is built from the charge level (hardlight_cannon0 to hardlight_cannon4).
 	inhand_icon_state = null
 	ammo_type = list(/obj/item/ammo_casing/energy/laser/hardlight)
 	fire_delay = 10
-	ammo_x_offset = 3
 	weapon_weight = WEAPON_HEAVY
-	shaded_charge = FALSE
+	shaded_charge = TRUE
 
 /obj/item/gun/energy/laser/hardlight/Initialize(mapload)
 	. = ..()
