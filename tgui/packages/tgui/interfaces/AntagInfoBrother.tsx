@@ -304,8 +304,8 @@ const GUIDE_TOPICS: GuideTopic[] = [
       <>
         <Box mb={1}>
           Blood brothers are a small team of conspirators working together
-          against the station. Every brother shares the same objectives, so your
-          team succeeds or fails together.
+          against the station. Every brother in your team shares the same
+          objectives, so your team succeeds or fails together.
         </Box>
         <Box mb={1}>
           Use the <b>Blood Bond</b> action to talk privately with your brothers.
@@ -374,10 +374,25 @@ const GUIDE_TOPICS: GuideTopic[] = [
           out in the process. If they refuse, you can't try to recruit them
           again.
         </Box>
+        <Box mb={1}>
+          You can't recruit people who are mindshielded, people who already
+          belong to another blood brother bond or serve another master, the
+          targets of your objectives, or anyone without a mind. Examine a flash
+          for more details.
+        </Box>
+        <Box mb={1}>
+          Your flash <b>can</b> recruit other antagonists. Only <i>your</i>{' '}
+          targets are off limits, so a traitor sent to kill you can still be
+          flashed. Turn your hunter into your brother!
+        </Box>
         <Box>
-          You can't recruit people who are mindshielded or loyal to someone
-          else, the targets of your objectives, or anyone without a mind.
-          Examine a flash for more details.
+          Recruiting an antagonist, or a member of security or command, brings
+          more power to your team, but also more risk. Security and command have
+          to be kidnapped and have their mindshield surgically removed first,
+          which leaves you exposed while you work. Both draw more attention,
+          thanks to their gear, powers or authority. They're also more likely to
+          get caught in the crossfire later in the shift, when midround
+          antagonists start to appear.
         </Box>
       </>
     ),
@@ -412,9 +427,14 @@ const GUIDE_TOPICS: GuideTopic[] = [
           some need tools. Turn on <b>Can make only</b> to see what you can
           build right now.
         </Box>
-        <Box>
+        <Box mb={1}>
           Crafted <b>parts</b> upgrade your modular weapons. See the{' '}
           <b>Modular Weapons</b> topic.
+        </Box>
+        <Box>
+          Can't find a component you need? Ask your fellow conspirators over the
+          Blood Bond, or send a <b>mentorhelp</b>. Mentors are happy to tell you
+          where things can be found.
         </Box>
       </>
     ),
@@ -442,10 +462,15 @@ const GUIDE_TOPICS: GuideTopic[] = [
           their parts. <b>Energy</b> weapons can be modified at any time, but
           adding or removing a power cell drains them to zero charge.
         </Box>
-        <Box>
+        <Box mb={1}>
           The scrap revolver's cylinder can be switched between .38 and 12 gauge
           with a <b>wrench</b>. Unload it first, or a live round will go off in
           your face.
+        </Box>
+        <Box>
+          Not every blood brother weapon is modular. The ones that can't be
+          upgraded, like the <b>electrified bola</b>, aren't any worse for it.
+          They're built to do their job well right out of the crafting menu.
         </Box>
       </>
     ),
@@ -463,9 +488,22 @@ const GUIDE_TOPICS: GuideTopic[] = [
           Split up the work. One brother can gather materials while another
           crafts or scouts a target.
         </Box>
+        <Box mb={1}>
+          Don't flash people near security, or near the crew at all. A flash is
+          loud and easy to recognize, which makes it a very good way to get
+          caught.
+        </Box>
+        <Box mb={1}>
+          A mindshield stops you from recruiting someone, but it can't break a
+          bond that already exists. If you can kidnap a member of security or
+          command and get their mindshield out, flash them. They stay your
+          brother even if they're implanted again later.
+        </Box>
         <Box>
-          Don't flash people in front of security. A failed recruitment is a
-          very good way to get caught.
+          Your bond is permanent. Cultists and darkspawn thralls can be
+          deconverted, but nothing the crew does can turn a blood brother back.
+          Other conversion antagonists may recruit more people, but every
+          brother you gain is yours for good.
         </Box>
       </>
     ),
