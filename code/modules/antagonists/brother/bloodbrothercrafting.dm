@@ -114,15 +114,26 @@
 		/obj/item/ammo_box/magazine/smgm45 = 1,
 	)
 
-/datum/crafting_recipe/blood_brother/brotherly_implant
-	name = "Brotherly Implant"
-	desc = "A placeholder implant for future Blood Brother designs."
+/datum/crafting_recipe/blood_brother/toolset_implant
+	name = "Toolset Arm Implant"
+	desc = "A full set of tools crammed into a cyborg arm, ready to be implanted into your own. Either cyborg arm will do."
 	category = CAT_BB_IMPLANTS
-	result = /obj/item/coin/iron
+	result = /obj/item/organ/internal/cyberimp/arm/item_set/toolset
 	reqs = list(
-		/obj/item/stack/sheet/iron = 1,
-		/obj/item/stack/sheet/glass = 1,
+		/obj/item/bodypart/arm = 1,
+		/obj/item/screwdriver = 1,
+		/obj/item/weldingtool = 1,
+		/obj/item/wirecutters = 1,
+		/obj/item/multitool = 1,
+		/obj/item/wrench = 1,
+		/obj/item/stack/cable_coil = 10,
 	)
+	time = 10 SECONDS
+
+/datum/crafting_recipe/blood_brother/toolset_implant/New()
+	. = ..()
+	// Accept either cyborg arm, but never any other kind of arm.
+	blacklist |= typesof(/obj/item/bodypart/arm) - typesof(/obj/item/bodypart/arm/left/robot) - typesof(/obj/item/bodypart/arm/right/robot)
 
 /datum/crafting_recipe/blood_brother/electrified_bola
 	name = "Electrified Bola"
