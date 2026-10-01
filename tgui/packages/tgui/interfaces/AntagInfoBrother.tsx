@@ -380,19 +380,10 @@ const GUIDE_TOPICS: GuideTopic[] = [
           targets of your objectives, or anyone without a mind. Examine a flash
           for more details.
         </Box>
-        <Box mb={1}>
+        <Box>
           Your flash <b>can</b> recruit other antagonists. Only <i>your</i>{' '}
           targets are off limits, so a traitor sent to kill you can still be
           flashed. Turn your hunter into your brother!
-        </Box>
-        <Box>
-          Recruiting an antagonist, or a member of security or command, brings
-          more power to your team, but also more risk. Security and command have
-          to be kidnapped and have their mindshield surgically removed first,
-          which leaves you exposed while you work. Both draw more attention,
-          thanks to their gear, powers or authority. They're also more likely to
-          get caught in the crossfire later in the shift, when midround
-          antagonists start to appear.
         </Box>
       </>
     ),
@@ -454,18 +445,15 @@ const GUIDE_TOPICS: GuideTopic[] = [
           <b>alt-right-click</b> the weapon while holding it.
         </Box>
         <Box mb={1}>
-          A weapon can't fire without a <b>receiver</b>. Receivers set how it
-          fires: semi-auto, fully automatic, rifle or carbine.
+          A weapon can't fire without a <b>receiver</b>. Receivers determine the
+          weapon's statistics, like damage and projectile speed. When in doubt,
+          use a <b>semi-auto</b> receiver, which has neither benefits nor
+          drawbacks.
         </Box>
         <Box mb={1}>
           <b>Ballistic</b> weapons must be fully unloaded before you change
           their parts. <b>Energy</b> weapons can be modified at any time, but
           adding or removing a power cell drains them to zero charge.
-        </Box>
-        <Box mb={1}>
-          The scrap revolver's cylinder can be switched between .38 and 12 gauge
-          with a <b>wrench</b>. Unload it first, or a live round will go off in
-          your face.
         </Box>
         <Box>
           Not every blood brother weapon is modular. The ones that can't be

@@ -3,9 +3,9 @@
  *
  * Lets the owner exhale a cloud of choking smoke, and makes them immune to the coughing it causes.
  */
-/obj/item/organ/internal/lungs/smokebomb
+/obj/item/organ/internal/lungs/cybernetic/smokebomb
 	name = "smokebomb lungs"
-	desc = "A pair of lungs packed with smoke-producing glands. Whoever has these can exhale a thick, choking cloud without so much as a cough."
+	desc = "A pair of cybernetic lungs fitted with a smoke-powder reservoir. Whoever has these can exhale a thick, choking cloud without so much as a cough."
 	icon_state = "lungs_smokebomb"
 	actions_types = list(/datum/action/cooldown/smokebomb_lungs)
 	organ_traits = list(TRAIT_SMOKE_COUGH_IMMUNE)

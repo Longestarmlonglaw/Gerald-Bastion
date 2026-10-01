@@ -137,14 +137,21 @@
 
 /datum/crafting_recipe/blood_brother/smokebomb_lungs
 	name = "Smokebomb Lungs"
-	desc = "A pair of lungs packed with smoke powder, letting you exhale a cloud of choking smoke on demand. You'll be immune to the coughing, but not the blindness."
+	desc = "Cybernetic lungs loaded with smoke powder, letting you exhale a cloud of choking smoke on demand. You'll be immune to the coughing, but not the blindness. Any cybernetic lungs will do."
 	category = CAT_BB_IMPLANTS
-	result = /obj/item/organ/internal/lungs/smokebomb
+	result = /obj/item/organ/internal/lungs/cybernetic/smokebomb
 	reqs = list(
 		/obj/item/organ/internal/lungs = 1,
 		/datum/reagent/smoke_powder = 15,
 	)
 	time = 10 SECONDS
+
+/datum/crafting_recipe/blood_brother/smokebomb_lungs/New()
+	. = ..()
+	// Accept any robotic lungs, but never organic ones.
+	for(var/obj/item/organ/internal/lungs/lungs_type as anything in typesof(/obj/item/organ/internal/lungs))
+		if(!(initial(lungs_type.organ_flags) & ORGAN_ROBOTIC))
+			blacklist |= lungs_type
 
 /datum/crafting_recipe/blood_brother/electrified_bola
 	name = "Electrified Bola"
