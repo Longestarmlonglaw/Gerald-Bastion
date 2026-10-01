@@ -68,8 +68,8 @@
 	return FALSE
 
 /datum/component/blood_brother_gun/proc/can_modify_slot(slot, mob/living/user)
-	// Swapping an energy gun's power cell drains it anyway, so it is always safe.
-	if(slot == BB_GUN_PART_POWER_CELL && istype(parent, /obj/item/gun/energy))
+	// Energy guns can be modified at any time. Swapping their power cell drains them instead, see on_part_changed().
+	if(istype(parent, /obj/item/gun/energy))
 		return TRUE
 	if(is_loaded())
 		var/obj/item/gun/gun = parent
