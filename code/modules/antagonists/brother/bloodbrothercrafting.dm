@@ -30,7 +30,7 @@
 
 /datum/crafting_recipe/blood_brother
 	blood_brother_only = TRUE
-	category = CAT_BB_MISC
+	category = CAT_BB_SUPPORT
 	time = 3 SECONDS
 
 /datum/crafting_recipe/blood_brother/magazine_part
@@ -266,5 +266,64 @@
 		/obj/item/assembly/igniter = 1,
 		/obj/item/stack/cable_coil = 5,
 		/datum/reagent/consumable/sugar = 10,
+	)
+	time = 5 SECONDS
+
+/// Converts a regular .38 speedloader into a special one. Not a recipe itself, as it has no name or result.
+/datum/crafting_recipe/blood_brother/c38_speedloader
+	category = CAT_BB_AMMUNITION
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/c38_speedloader/New()
+	. = ..()
+	// Only accept a regular .38 speedloader, so special ones never get used up by mistake.
+	blacklist |= typesof(/obj/item/ammo_box/c38) - /obj/item/ammo_box/c38
+
+/datum/crafting_recipe/blood_brother/c38_speedloader/hotshot
+	name = ".38 Hot Shot Speedloader"
+	desc = "Pack a regular .38 speedloader's rounds with welding fuel for an incendiary payload."
+	result = /obj/item/ammo_box/c38/hotshot
+	reqs = list(
+		/obj/item/ammo_box/c38 = 1,
+		/datum/reagent/fuel = 10,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/c38_speedloader/iceblox
+	name = ".38 Iceblox Speedloader"
+	desc = "Pack a regular .38 speedloader's rounds with cryostylane for a cryogenic payload."
+	result = /obj/item/ammo_box/c38/iceblox
+	reqs = list(
+		/obj/item/ammo_box/c38 = 1,
+		/datum/reagent/cryostylane = 10,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/c38_speedloader/dumdum
+	name = ".38 DumDum Speedloader"
+	desc = "Notch the tips of a regular .38 speedloader's rounds so they expand on impact. Devastating against unarmored targets, weak against everything else."
+	result = /obj/item/ammo_box/c38/dumdum
+	reqs = list(
+		/obj/item/ammo_box/c38 = 1,
+	)
+	tool_behaviors = list(
+		TOOL_WIRECUTTER,
+	)
+
+/datum/crafting_recipe/blood_brother/bond_beacon
+	name = "Bond Beacon"
+	desc = "A single use tracking chip keyed to your blood bond. Apply it to yourself to share your location with your brothers in the conspirators tab for the rest of the round."
+	category = CAT_BB_SUPPORT
+	result = /obj/item/bond_beacon
+	reqs = list(
+		/obj/item/assembly/signaler = 1,
+		/obj/item/stack/cable_coil = 5,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
 	)
 	time = 5 SECONDS

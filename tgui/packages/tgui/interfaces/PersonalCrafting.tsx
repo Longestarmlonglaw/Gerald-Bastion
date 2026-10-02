@@ -72,6 +72,7 @@ const CATEGORY_ICONS_CRAFTING = {
   Explosives: 'bomb',
   Parts: 'cogs',
   Implants: 'microchip',
+  Support: 'hands-helping',
 } as const;
 
 const CATEGORY_ICONS_COOKING = {

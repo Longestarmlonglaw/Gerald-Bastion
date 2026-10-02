@@ -42,6 +42,8 @@ type Conspirator = {
   burn?: number;
   toxin?: number;
   oxygen?: number;
+  // Only present if this brother has used a bond beacon
+  location?: string;
 };
 
 type Data = {
@@ -233,6 +235,16 @@ const ConspiratorCard = (props: { conspirator: Conspirator }) => {
         </LabeledList.Item>
         <LabeledList.Item label="Job">
           {conspirator.job || 'Unknown'}
+        </LabeledList.Item>
+        <LabeledList.Item label="Location">
+          {conspirator.location ? (
+            <Box>
+              <Icon name="location-dot" mr={1} />
+              {conspirator.location}
+            </Box>
+          ) : (
+            <Box color="label">Not shared</Box>
+          )}
         </LabeledList.Item>
         {hasBody && (
           <>

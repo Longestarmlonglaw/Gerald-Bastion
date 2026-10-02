@@ -23,6 +23,8 @@
 	var/popup = FALSE
 	///The tab currently open in the brother panel, as a BB_UI_TAB_* define.
 	var/ui_tab = BB_UI_TAB_OBJECTIVES
+	///Whether this brother's location is shown to the team in the conspirators tab, from using a bond beacon.
+	var/sharing_location = FALSE
 
 /datum/antagonist/brother/create_team(datum/team/brother_team/new_team)
 	if(!new_team)
@@ -194,7 +196,7 @@
 	for(var/key in crafting_data)
 		data[key] = crafting_data[key]
 
-/// Returns the name, rank and health of every member of the team, for the conspirators tab.
+/// Returns the name, rank, health and (if shared) location of every member of the team, for the conspirators tab.
 /datum/antagonist/brother/proc/get_conspirator_data()
 	var/list/conspirators = list()
 	for(var/datum/mind/member as anything in team?.members)
@@ -225,6 +227,9 @@
 			entry["burn"] = body.getFireLoss()
 			entry["toxin"] = body.getToxLoss()
 			entry["oxygen"] = body.getOxyLoss()
+			var/turf/body_turf = get_turf(body)
+			if(their_bond?.sharing_location && body_turf)
+				entry["location"] = "[get_area_name(body_turf, TRUE)] ([body_turf.x], [body_turf.y])"
 		conspirators += list(entry)
 	return conspirators
 

@@ -92,4 +92,4 @@
 #define CAT_BB_EXPLOSIVES "Explosives"
 #define CAT_BB_PARTS "Parts"
 #define CAT_BB_IMPLANTS "Implants"
-#define CAT_BB_MISC "Misc"
+#define CAT_BB_SUPPORT "Support"
