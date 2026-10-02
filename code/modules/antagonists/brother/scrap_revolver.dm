@@ -4,11 +4,16 @@
  * Its improvised cylinder can be configured between .38 and 12 gauge ammunition.
  */
 
+/// How many .38 rounds the scrap revolver's cylinder holds, before any magazine part.
+#define SCRAP_REVOLVER_38_CAPACITY 6
+/// How many 12 gauge shells the scrap revolver's cylinder holds, before any magazine part.
+#define SCRAP_REVOLVER_SHOTGUN_CAPACITY 3
+
 /obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap
 	name = "scrap revolver cylinder"
 	ammo_type = /obj/item/ammo_casing/c38
 	caliber = CALIBER_38
-	max_ammo = 6
+	max_ammo = SCRAP_REVOLVER_38_CAPACITY
 	start_empty = TRUE
 	multiload = FALSE
 
@@ -38,9 +43,9 @@
 	. = ..()
 	var/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/cylinder = magazine
 	if(cylinder?.shotgun_mode)
-		. += span_notice("The cylinder is configured for 12 gauge shotgun shells. It holds up to 3 shells.")
-	else
-		. += span_notice("The cylinder is configured for .38 rounds. It holds up to 6 rounds.")
+		. += span_notice("The cylinder is configured for 12 gauge shotgun shells. It holds up to [cylinder.max_ammo] shells.")
+	else if(cylinder)
+		. += span_notice("The cylinder is configured for .38 rounds. It holds up to [cylinder.max_ammo] rounds.")
 	. += span_warning("Do not wrench the cylinder while live ammunition is loaded.")
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap/wrench_act(mob/living/user, obj/item/I)
@@ -68,31 +73,32 @@
 	if(!I.use_tool(src, user, 3 SECONDS))
 		return TRUE
 
+	var/new_base_capacity
 	cylinder.shotgun_mode = !cylinder.shotgun_mode
 	if(cylinder.shotgun_mode)
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
-		cylinder.max_ammo = 3
+		new_base_capacity = SCRAP_REVOLVER_SHOTGUN_CAPACITY
 		base_icon_state = "revolver_scrap_shotgun"
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
 		cylinder.ammo_type = /obj/item/ammo_casing/c38
 		cylinder.caliber = CALIBER_38
-		cylinder.max_ammo = 6
+		new_base_capacity = SCRAP_REVOLVER_38_CAPACITY
 		base_icon_state = "revolver_scrap_c38"
 		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
 
 	// A mode switch is only possible with no live rounds, so anything left in the cylinder
-	// is a spent casing of the old caliber. Dump them all and resize the cylinder's chambers.
+	// is a spent casing of the old caliber. Dump them all, then resize the cylinder for the new caliber.
 	var/list/spent_casings = cylinder.ammo_list()
 	cylinder.stored_ammo = list()
-	for(var/i in 1 to cylinder.max_ammo)
-		cylinder.stored_ammo += null
 	for(var/obj/item/ammo_casing/spent_casing as anything in spent_casings)
 		spent_casing.forceMove(drop_location())
-	cylinder.update_appearance()
+	// The gun component adds any magazine part's extra rounds on top of the new base capacity.
+	var/datum/component/blood_brother_gun/modular_gun = GetComponent(/datum/component/blood_brother_gun)
+	modular_gun.set_base_capacity(new_base_capacity)
 	update_appearance()
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap/Initialize(mapload)
@@ -102,3 +108,6 @@
 		part_slots = list(BB_GUN_PART_MAGAZINE, BB_GUN_PART_RECEIVER, BB_GUN_PART_BARREL, BB_GUN_PART_UNDERBARREL), \
 		default_parts = list(/obj/item/blood_brother_gun_part/receiver/semi_auto), \
 	)
+
+#undef SCRAP_REVOLVER_38_CAPACITY
+#undef SCRAP_REVOLVER_SHOTGUN_CAPACITY

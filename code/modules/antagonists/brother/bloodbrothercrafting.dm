@@ -33,14 +33,54 @@
 	category = CAT_BB_SUPPORT
 	time = 3 SECONDS
 
-/datum/crafting_recipe/blood_brother/magazine_part
-	name = "Magazine"
-	desc = "An improvised ballistic magazine component built around a matter bin."
+/datum/crafting_recipe/blood_brother/extended_magazine
+	name = "Extended Magazine"
+	desc = "Adds a couple of extra rounds to a weapon's internal magazine, like a revolver's cylinder."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/magazine
+	result = /obj/item/blood_brother_gun_part/magazine/extended
 	reqs = list(
 		/obj/item/stock_parts/matter_bin = 1,
+		/obj/item/stack/sheet/iron = 5,
 	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/extended_magazine/New()
+	. = ..()
+	// Only accept a basic matter bin, so better ones never get used up by mistake.
+	blacklist |= typesof(/obj/item/stock_parts/matter_bin) - /obj/item/stock_parts/matter_bin
+
+/datum/crafting_recipe/blood_brother/big_magazine
+	name = "Big Magazine"
+	desc = "Adds a lot of extra rounds to a weapon's internal magazine, but makes the weapon one size bigger."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/magazine/big
+	reqs = list(
+		/obj/item/stock_parts/matter_bin/adv = 1,
+		/obj/item/stack/sheet/iron = 10,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/bluespace_magazine
+	name = "Bluespace Magazine"
+	desc = "Lets a weapon's internal magazine hold an absurd number of rounds, but loading ammunition into it takes a moment."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/magazine/bluespace
+	reqs = list(
+		/obj/item/stock_parts/matter_bin/bluespace = 1,
+		/obj/item/stack/ore/bluespace_crystal = 5,
+		/obj/item/stack/sheet/mineral/diamond = 2,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_MULTITOOL,
+	)
+	time = 15 SECONDS
 
 /datum/crafting_recipe/blood_brother/semi_auto_receiver_part
 	name = "Semi-Auto Receiver"
@@ -87,14 +127,64 @@
 		/obj/item/pipe = 1,
 	)
 
-/datum/crafting_recipe/blood_brother/power_cell_part
-	name = "Power Cell"
-	desc = "An improvised energy weapon power cell."
+/datum/crafting_recipe/blood_brother/upgraded_cell
+	name = "Upgraded Cell"
+	desc = "Doubles an energy weapon's charge capacity."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/power_cell
+	result = /obj/item/blood_brother_gun_part/power_cell/upgraded
 	reqs = list(
-		/obj/item/stock_parts/power_store/cell = 1,
+		/obj/item/stock_parts/power_store/cell/high = 1,
+		/obj/item/stack/cable_coil = 5,
 	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/emp_shielded_cell
+	name = "EMP Shielded Cell"
+	desc = "Holds less charge than an upgraded cell, but an EMP fully recharges your energy weapon instead of draining it."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/power_cell/emp_shielded
+	reqs = list(
+		/obj/item/stock_parts/power_store/cell/high = 1,
+		/obj/item/stack/sheet/plasteel = 2,
+		/obj/item/stack/cable_coil = 5,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/self_recharging_cell
+	name = "Self-Recharging Cell"
+	desc = "Slowly recharges your energy weapon over time."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/power_cell/self_recharging
+	reqs = list(
+		/obj/item/stock_parts/power_store/cell/high = 1,
+		/obj/item/slime_extract/yellow = 1,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/unstable_cell
+	name = "Unstable Cell"
+	desc = "Quadruples your energy weapon's capacity, and lets you recharge it by feeding it uranium. But it sparks with every shot, leaks radiation, and an EMP will make it violently discharge into you."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/power_cell/unstable
+	reqs = list(
+		/obj/item/stock_parts/power_store/cell/hyper = 1,
+		/obj/item/stack/sheet/mineral/uranium = 5,
+		/obj/item/stack/sheet/mineral/plasma = 2,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WELDER,
+	)
+	time = 10 SECONDS
 
 /datum/crafting_recipe/blood_brother/lens_part
 	name = "Lens"

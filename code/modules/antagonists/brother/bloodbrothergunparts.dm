@@ -37,6 +37,12 @@
 	icon_state = "BBmagazine_parent"
 	bb_part_slot = BB_GUN_PART_MAGAZINE
 	bb_weapon_family = BB_GUN_BALLISTIC
+	/// Extra rounds this magazine adds to a weapon's internal magazine.
+	var/bb_extra_rounds = 0
+	/// How many weight classes this magazine adds to the weapon.
+	var/bb_weight_class_increase = 0
+	/// How long loading ammunition into the weapon takes with this magazine installed. 0 for instant.
+	var/bb_load_delay = 0
 
 /obj/item/blood_brother_gun_part/receiver
 	name = "receiver"
@@ -65,6 +71,14 @@
 	icon_state = "BBcell_parent"
 	bb_part_slot = BB_GUN_PART_POWER_CELL
 	bb_weapon_family = BB_GUN_ENERGY
+	/// Multiplier applied to the weapon's cell capacity.
+	var/bb_capacity_multiplier = 1
+	/// Whether an EMP fully recharges the weapon instead of draining it.
+	var/bb_emp_recharges = FALSE
+	/// Whether the weapon slowly recharges itself over time.
+	var/bb_self_recharging = FALSE
+	/// Whether the cell is unstable: it can be fed uranium, but sparks when fired and is wrecked by EMPs.
+	var/bb_unstable = FALSE
 
 /obj/item/blood_brother_gun_part/underbarrel
 	name = "underbarrel"
@@ -83,17 +97,13 @@
 
 /obj/item/blood_brother_gun_part/receiver/semi_auto
 	name = "semi-auto receiver"
-	// Placeholder sprite until this receiver gets its own.
-	icon = /obj/item/firing_pin::icon
-	icon_state = /obj/item/firing_pin::icon_state
+	icon_state = "semi_auto_receiver"
 	desc = "An improvised semi-automatic receiver. One shot per trigger pull, with no changes to the weapon's damage, projectile speed or rate of fire. When in doubt, use this one."
 	bb_receiver_type = BB_GUN_RECEIVER_SEMI_AUTO
 
 /obj/item/blood_brother_gun_part/receiver/automatic
 	name = "automatic receiver"
-	// Placeholder sprite until this receiver gets its own.
-	icon = /obj/item/firing_pin::icon
-	icon_state = /obj/item/firing_pin::icon_state
+	icon_state = "full_auto_receiver"
 	desc = "An improvised fully automatic receiver. Hold down the trigger to keep firing at a rapid rate."
 	bb_receiver_type = BB_GUN_RECEIVER_AUTOMATIC
 	bb_damage_multiplier = 1
@@ -102,9 +112,7 @@
 
 /obj/item/blood_brother_gun_part/receiver/rifle
 	name = "rifle receiver"
-	// Placeholder sprite until this receiver gets its own.
-	icon = /obj/item/firing_pin::icon
-	icon_state = /obj/item/firing_pin::icon_state
+	icon_state = "rifle_receiver"
 	desc = "An improvised rifle receiver. Each shot hits harder and flies faster, but the weapon fires much more slowly."
 	bb_receiver_type = BB_GUN_RECEIVER_RIFLE
 	bb_damage_multiplier = 1.2
@@ -113,11 +121,55 @@
 
 /obj/item/blood_brother_gun_part/receiver/carbine
 	name = "carbine receiver"
-	// Placeholder sprite until this receiver gets its own.
-	icon = /obj/item/firing_pin::icon
-	icon_state = /obj/item/firing_pin::icon_state
+	icon_state = "carbine_receiver"
 	desc = "An improvised carbine receiver. A middle ground between semi-auto and rifle: shots hit a little harder and fly a little faster, at a somewhat slower rate of fire."
 	bb_receiver_type = BB_GUN_RECEIVER_CARBINE
 	bb_damage_multiplier = 1.1
 	bb_projectile_speed_multiplier = 1.1
 	bb_fire_interval = 1 SECONDS
+
+// Magazines. These only work on weapons with internal magazines, like revolvers.
+
+/obj/item/blood_brother_gun_part/magazine/extended
+	name = "extended magazine"
+	icon_state = "extended_magazine"
+	desc = "An improvised magazine extension that lets a weapon's internal magazine hold a couple of extra rounds."
+	bb_extra_rounds = 2
+
+/obj/item/blood_brother_gun_part/magazine/big
+	name = "big magazine"
+	icon_state = "big_magazine"
+	desc = "A bulky improvised magazine that lets a weapon's internal magazine hold a lot more rounds, at the cost of making the weapon noticeably larger."
+	bb_extra_rounds = 4
+	bb_weight_class_increase = 1
+
+/obj/item/blood_brother_gun_part/magazine/bluespace
+	name = "bluespace magazine"
+	icon_state = "bluespace_magazine"
+	desc = "A magazine that folds space around a weapon's internal magazine, letting it hold an absurd number of rounds. Squeezing ammunition into a pocket dimension takes a moment, though."
+	bb_extra_rounds = 18
+	bb_load_delay = 1.5 SECONDS
+
+// Power cells
+
+/obj/item/blood_brother_gun_part/power_cell/upgraded
+	name = "upgraded cell"
+	desc = "An improvised high-capacity cell that lets an energy weapon hold a lot more charge."
+	bb_capacity_multiplier = 2
+
+/obj/item/blood_brother_gun_part/power_cell/emp_shielded
+	name = "EMP shielded cell"
+	desc = "An improvised cell wrapped in shielding. It holds less charge than an upgraded cell, but instead of being drained by an EMP, it soaks up the pulse and fully recharges the weapon."
+	bb_capacity_multiplier = 1.5
+	bb_emp_recharges = TRUE
+
+/obj/item/blood_brother_gun_part/power_cell/self_recharging
+	name = "self-recharging cell"
+	desc = "An improvised cell built around a yellow slime core. It slowly recharges the weapon on its own."
+	bb_self_recharging = TRUE
+
+/obj/item/blood_brother_gun_part/power_cell/unstable
+	name = "unstable cell"
+	desc = "A crackling, barely contained cell with an enormous capacity. The weapon can be recharged by feeding it uranium sheets, but it sparks with every shot, leaks radiation, and an EMP will make it violently discharge into whoever is holding it."
+	bb_capacity_multiplier = 4
+	bb_unstable = TRUE
