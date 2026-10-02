@@ -38,6 +38,7 @@
 	impact_effect_type = /obj/effect/temp_visual/impact_effect/blue_laser
 	light_color = LIGHT_COLOR_BLUE
 
+/// The beam is solid enough to also bruise and blind targets.
 /obj/projectile/beam/laser/hardlight_cannon/on_hit(atom/target, blocked = 0, pierce_hit)
 	. = ..()
 	if(iscarbon(target) && !blocked)

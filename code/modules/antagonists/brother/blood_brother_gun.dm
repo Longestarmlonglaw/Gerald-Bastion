@@ -2,7 +2,11 @@
  * Blood Brother modular gun.
  *
  * Tracks the upgrade slots a Blood Brother weapon exposes and the parts installed in them,
- * and applies the stats of the installed receiver to the gun.
+ * and applies their effects to the gun: receivers change damage, speed and fire rate,
+ * magazines change an internal magazine's capacity, and power cells change an energy gun's cell.
+ *
+ * Add it to a gun with AddComponent(), listing its weapon family, slots and any default parts.
+ * The part types and their stats live in bloodbrothergunparts.dm.
  */
 /datum/component/blood_brother_gun
 	/// Upgrade slots this gun exposes, as BB_GUN_PART_* defines.
@@ -48,7 +52,10 @@
 	for(var/part_type in default_parts)
 		var/obj/item/blood_brother_gun_part/part = new part_type(gun)
 		LAZYSET(installed_parts, part.bb_part_slot, part)
+	// Apply every default part's effects. Unlike on_part_changed(), this doesn't drain the gun's cell.
 	update_receiver()
+	update_magazine()
+	update_power_cell()
 
 /datum/component/blood_brother_gun/Destroy(force)
 	installed_parts = null
@@ -89,6 +96,7 @@
 			return TRUE
 	return FALSE
 
+/// Whether parts can be swapped in the given slot right now. Ballistic guns must be unloaded first.
 /datum/component/blood_brother_gun/proc/can_modify_slot(slot, mob/living/user)
 	// Energy guns can be modified at any time. Swapping their power cell drains them instead, see on_part_changed().
 	if(istype(parent, /obj/item/gun/energy))
@@ -99,6 +107,7 @@
 		return FALSE
 	return TRUE
 
+/// Installs a part from the user's hands, swapping out whatever was in that slot before. Returns TRUE on success.
 /datum/component/blood_brother_gun/proc/try_install_part(obj/item/blood_brother_gun_part/part, mob/living/user)
 	var/obj/item/gun/gun = parent
 	var/slot = part.bb_part_slot
@@ -122,6 +131,7 @@
 	to_chat(user, span_notice("You install [part] into [gun]."))
 	return TRUE
 
+/// Takes the part out of the given slot and puts it in the user's hands. Returns TRUE on success.
 /datum/component/blood_brother_gun/proc/remove_part(mob/living/user, slot)
 	if(!can_modify_slot(slot, user))
 		return FALSE
@@ -196,6 +206,7 @@
 		casing.forceMove(gun.drop_location())
 	internal_magazine.update_appearance()
 
+/// Empties an energy gun's cell. Done whenever its power cell part is added or removed.
 /datum/component/blood_brother_gun/proc/drain_cell()
 	var/obj/item/gun/energy/energy_gun = parent
 	if(!istype(energy_gun) || !energy_gun.cell)
@@ -230,7 +241,7 @@
 /// Recharges an unstable cell with a uranium sheet. Radiation leaks out each time.
 /datum/component/blood_brother_gun/proc/feed_uranium(obj/item/stack/sheet/mineral/uranium/uranium, mob/living/user)
 	var/obj/item/gun/energy/energy_gun = parent
-	if(!energy_gun.cell)
+	if(!istype(energy_gun) || !energy_gun.cell)
 		return
 	if(energy_gun.cell.charge >= energy_gun.cell.maxcharge)
 		energy_gun.balloon_alert(user, "already fully charged!")
@@ -242,7 +253,8 @@
 	energy_gun.update_appearance()
 	energy_gun.balloon_alert(user, "fed uranium")
 	do_sparks(2, FALSE, energy_gun)
-	radiation_pulse(energy_gun, max_range = 2, threshold = RAD_LIGHT_INSULATION, chance = 20)
+	// Pulse from the turf rather than the gun, so it still works while the gun is held or worn.
+	radiation_pulse(get_turf(energy_gun), max_range = 2, threshold = RAD_LIGHT_INSULATION, chance = 20)
 
 /// Applies the installed receiver's stats to the gun, replacing those of the previous receiver.
 /datum/component/blood_brother_gun/proc/update_receiver()
@@ -265,11 +277,13 @@
 		gun.AddComponent(/datum/component/automatic_fire, receiver.bb_fire_interval)
 		added_autofire = TRUE
 
+/// Sets the gun's delay between shots to the receiver's, or back to the gun's own if the receiver doesn't change it.
 /datum/component/blood_brother_gun/proc/update_fire_delay()
 	var/obj/item/gun/gun = parent
 	var/obj/item/blood_brother_gun_part/receiver/receiver = get_part(BB_GUN_PART_RECEIVER)
 	gun.fire_delay = receiver?.bb_fire_interval || get_base_fire_delay()
 
+/// Returns the gun's own delay between shots, ignoring any receiver.
 /datum/component/blood_brother_gun/proc/get_base_fire_delay()
 	var/obj/item/gun/energy/energy_gun = parent
 	if(istype(energy_gun))
@@ -277,6 +291,7 @@
 		return shot.delay
 	return base_fire_delay
 
+/// Lists the gun's upgrade slots and what's installed in them.
 /datum/component/blood_brother_gun/proc/on_examine(datum/source, mob/user, list/examine_list)
 	SIGNAL_HANDLER
 
@@ -299,6 +314,7 @@
 		on_part_changed(slot)
 		return
 
+/// Alt-right-clicking the gun while holding it opens a menu to remove an installed part.
 /datum/component/blood_brother_gun/proc/on_click_alt_secondary(datum/source, mob/user)
 	SIGNAL_HANDLER
 
@@ -307,22 +323,32 @@
 	INVOKE_ASYNC(src, PROC_REF(choose_part_to_remove), user)
 	return COMPONENT_CANCEL_CLICK_ALT_SECONDARY
 
+/// Shows a radial menu of the installed parts, then removes the one the user picks.
 /datum/component/blood_brother_gun/proc/choose_part_to_remove(mob/living/user)
 	var/obj/item/gun/gun = parent
-	var/list/available_parts = list()
+	// Keyed by slot, so the menu returns the slot to remove.
+	var/list/choices = list()
 	for(var/slot in part_slots)
 		var/obj/item/part = get_part(slot)
-		if(part)
-			available_parts["[part.name] ([slot])"] = slot
+		if(!part)
+			continue
+		var/datum/radial_menu_choice/choice = new
+		choice.name = "[part.name] ([slot])"
+		choice.image = image(icon = part.icon, icon_state = part.icon_state)
+		choices[slot] = choice
 
-	if(!length(available_parts))
+	if(!length(choices))
 		gun.balloon_alert(user, "no upgrades installed!")
 		return
 
-	var/selected_part = tgui_input_list(user, "Choose an installed upgrade to remove.", "Blood Brother Upgrades", available_parts)
-	if(isnull(selected_part) || QDELETED(src) || !user.is_holding(gun))
+	var/selected_slot = show_radial_menu(user, gun, choices, custom_check = CALLBACK(src, PROC_REF(can_use_part_menu), user), require_near = TRUE, tooltips = TRUE, autopick_single_option = FALSE)
+	if(isnull(selected_slot) || QDELETED(src) || !can_use_part_menu(user))
 		return
-	remove_part(user, available_parts[selected_part])
+	remove_part(user, selected_slot)
+
+/// Whether the user can still use the part removal menu. They have to keep holding the gun.
+/datum/component/blood_brother_gun/proc/can_use_part_menu(mob/living/user)
+	return !QDELETED(user) && user.is_holding(parent)
 
 /// Handles feeding uranium to an unstable cell, and makes loading ammunition take time when the installed magazine has a load delay.
 /datum/component/blood_brother_gun/proc/on_attackby(datum/source, obj/item/tool, mob/living/user, list/modifiers)
@@ -378,18 +404,22 @@
 	if(prob(25))
 		do_sparks(2, FALSE, source)
 	if(prob(20))
-		radiation_pulse(source, max_range = 1, threshold = RAD_LIGHT_INSULATION, chance = 100)
+		// Pulse from the turf rather than the gun, so it still works while the gun is held.
+		radiation_pulse(get_turf(source), max_range = 1, threshold = RAD_LIGHT_INSULATION, chance = 100)
 
+/// Loads the ammo into the gun after a delay, for magazines with a load delay like the bluespace magazine.
 /datum/component/blood_brother_gun/proc/delayed_load(obj/item/ammo, mob/living/user, delay)
 	if(loading)
 		return
 	var/obj/item/gun/ballistic/ballistic_gun = parent
 	loading = TRUE
 	ballistic_gun.balloon_alert(user, "loading...")
-	if(do_after(user, delay, ballistic_gun) && !QDELETED(ammo))
+	// The ammo has to still be in their hands, so they can't put it away mid-load and have it load anyway.
+	if(do_after(user, delay, ballistic_gun) && !QDELETED(ammo) && user.is_holding(ammo))
 		ballistic_gun.load_gun(ammo, user)
 	loading = FALSE
 
+/// Stops the gun from firing without a receiver.
 /datum/component/blood_brother_gun/proc/on_try_fire(obj/item/gun/source, mob/living/user, atom/target, flag, params)
 	SIGNAL_HANDLER
 

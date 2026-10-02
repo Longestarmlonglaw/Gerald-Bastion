@@ -17,6 +17,7 @@
 	start_empty = TRUE
 	multiload = FALSE
 
+	/// Whether the cylinder is set up for 12 gauge shells instead of .38 rounds. Switched with a wrench.
 	var/shotgun_mode = FALSE
 
 /obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/Initialize(mapload)
@@ -48,6 +49,7 @@
 		. += span_notice("The cylinder is configured for .38 rounds. It holds up to [cylinder.max_ammo] rounds.")
 	. += span_warning("Do not wrench the cylinder while live ammunition is loaded.")
 
+/// Wrenching the revolver switches its cylinder between .38 and 12 gauge. It has to be unloaded first, or a round goes off.
 /obj/item/gun/ballistic/revolver/blood_brother_scrap/wrench_act(mob/living/user, obj/item/I)
 	if(!user.is_holding(src))
 		balloon_alert(user, "hold to modify!")

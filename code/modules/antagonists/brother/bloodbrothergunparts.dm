@@ -16,6 +16,7 @@
 	/// The weapon family this part is restricted to, as a BB_GUN_* define. Null if it fits any family.
 	var/bb_weapon_family
 
+/// Using a part on a Blood Brother weapon installs it.
 /obj/item/blood_brother_gun_part/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!isgun(interacting_with))
 		return NONE
