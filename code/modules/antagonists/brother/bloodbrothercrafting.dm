@@ -255,3 +255,16 @@
 		TOOL_WELDER,
 	)
 	time = 10 SECONDS
+
+/datum/crafting_recipe/blood_brother/smoke_grenade
+	name = "Smoke Grenade"
+	desc = "You could probably mass produce these at the chemistry labs, but not having to steal or beg for a chem dispenser is a plus."
+	category = CAT_BB_EXPLOSIVES
+	result = /obj/item/grenade/smokebomb
+	reqs = list(
+		/obj/item/reagent_containers/cup/soda_cans = 1,
+		/obj/item/assembly/igniter = 1,
+		/obj/item/stack/cable_coil = 5,
+		/datum/reagent/consumable/sugar = 10,
+	)
+	time = 5 SECONDS
