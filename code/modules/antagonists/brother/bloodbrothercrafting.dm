@@ -226,3 +226,32 @@
 		/obj/item/stock_parts/scanning_module = 1,
 		/obj/item/stock_parts/capacitor = 2,
 	)
+
+/datum/crafting_recipe/blood_brother/ned_kelly_armor
+	name = "Ned Kelly Armor"
+	desc = "Heavy plate armor that protects your chest, groin and arms, but not your legs. Wear it with the Ned Kelly helmet to become immune to stuns."
+	category = CAT_BB_ARMOR
+	result = /obj/item/clothing/suit/armor/ned_kelly
+	reqs = list(
+		/obj/item/stack/sheet/plasteel = 5,
+		/obj/item/stack/sheet/iron = 20,
+	)
+	tool_behaviors = list(
+		TOOL_WELDER,
+		TOOL_WRENCH,
+	)
+	time = 20 SECONDS
+
+/datum/crafting_recipe/blood_brother/ned_kelly_helmet
+	name = "Ned Kelly Helmet"
+	desc = "A heavy iron helmet that covers your whole face. Wear it with the Ned Kelly armor to become immune to stuns."
+	category = CAT_BB_ARMOR
+	result = /obj/item/clothing/head/helmet/ned_kelly
+	reqs = list(
+		/obj/item/stack/sheet/plasteel = 2,
+		/obj/item/stack/sheet/iron = 10,
+	)
+	tool_behaviors = list(
+		TOOL_WELDER,
+	)
+	time = 10 SECONDS

@@ -3396,6 +3396,7 @@
 #include "code\modules\antagonists\brother\brother_team.dm"
 #include "code\modules\antagonists\brother\electrified_bola.dm"
 #include "code\modules\antagonists\brother\hardlight_cannon.dm"
+#include "code\modules\antagonists\brother\ned_kelly_armor.dm"
 #include "code\modules\antagonists\brother\scrap_revolver.dm"
 #include "code\modules\antagonists\brother\smokebomb_lungs.dm"
 #include "code\modules\antagonists\brother\actions\_action.dm"
