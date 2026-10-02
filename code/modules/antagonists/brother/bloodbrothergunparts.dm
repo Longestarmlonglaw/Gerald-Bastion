@@ -154,22 +154,26 @@
 
 /obj/item/blood_brother_gun_part/power_cell/upgraded
 	name = "upgraded cell"
+	icon_state = "upgraded_cell"
 	desc = "An improvised high-capacity cell that lets an energy weapon hold a lot more charge."
 	bb_capacity_multiplier = 2
 
 /obj/item/blood_brother_gun_part/power_cell/emp_shielded
 	name = "EMP shielded cell"
+	icon_state = "emp_shielded_cell"
 	desc = "An improvised cell wrapped in shielding. It holds less charge than an upgraded cell, but instead of being drained by an EMP, it soaks up the pulse and fully recharges the weapon."
 	bb_capacity_multiplier = 1.5
 	bb_emp_recharges = TRUE
 
 /obj/item/blood_brother_gun_part/power_cell/self_recharging
 	name = "self-recharging cell"
+	icon_state = "self_recharging_cell"
 	desc = "An improvised cell built around a yellow slime core. It slowly recharges the weapon on its own."
 	bb_self_recharging = TRUE
 
 /obj/item/blood_brother_gun_part/power_cell/unstable
 	name = "unstable cell"
+	icon_state = "unstable_cell"
 	desc = "A crackling, barely contained cell with an enormous capacity. The weapon can be recharged by feeding it uranium sheets, but it sparks with every shot, leaks radiation, and an EMP will make it violently discharge into whoever is holding it."
 	bb_capacity_multiplier = 4
 	bb_unstable = TRUE

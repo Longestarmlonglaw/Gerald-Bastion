@@ -242,7 +242,7 @@
 	energy_gun.update_appearance()
 	energy_gun.balloon_alert(user, "fed uranium")
 	do_sparks(2, FALSE, energy_gun)
-	radiation_pulse(energy_gun, max_range = 2, threshold = RAD_LIGHT_INSULATION, chance = URANIUM_IRRADIATION_CHANCE)
+	radiation_pulse(energy_gun, max_range = 2, threshold = RAD_LIGHT_INSULATION, chance = 20)
 
 /// Applies the installed receiver's stats to the gun, replacing those of the previous receiver.
 /datum/component/blood_brother_gun/proc/update_receiver()
@@ -366,15 +366,19 @@
 		energy_gun.visible_message(span_danger("[energy_gun]'s unstable cell violently discharges!"))
 	return NONE
 
-/// Unstable cells spark with every shot, and sometimes leak radiation.
+/// Unstable cells sometimes spark and leak radiation when the gun fires a shot.
 /datum/component/blood_brother_gun/proc/on_fired(obj/item/gun/source, mob/living/user, atom/target, params, zone_override)
 	SIGNAL_HANDLER
 
 	if(!get_unstable_cell())
 		return
-	do_sparks(2, FALSE, source)
-	if(prob(10))
-		radiation_pulse(source, max_range = 1, threshold = RAD_LIGHT_INSULATION, chance = URANIUM_IRRADIATION_CHANCE)
+	// This signal is sent on every trigger pull, even while the gun is cooling down or has nothing to fire, so ignore those.
+	if(source.semicd || !source.chambered?.loaded_projectile)
+		return
+	if(prob(25))
+		do_sparks(2, FALSE, source)
+	if(prob(20))
+		radiation_pulse(source, max_range = 1, threshold = RAD_LIGHT_INSULATION, chance = 100)
 
 /datum/component/blood_brother_gun/proc/delayed_load(obj/item/ammo, mob/living/user, delay)
 	if(loading)
