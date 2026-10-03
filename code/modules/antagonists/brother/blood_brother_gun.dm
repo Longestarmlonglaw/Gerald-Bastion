@@ -26,6 +26,8 @@
 	var/added_autofire = FALSE
 	/// How many rounds the gun's internal magazine holds before any magazine part. Null if it has no internal magazine.
 	var/base_capacity
+	/// Multiplier applied to the internal magazine's total capacity, after the magazine part's extra rounds. Used by the scrap revolver's shotgun mode.
+	var/capacity_multiplier = 1
 	/// How many weight classes the current magazine and barrel have added to the gun. Can be negative.
 	var/applied_weight_class_change = 0
 	/// Whether someone is currently loading ammunition through a magazine with a load delay.
@@ -211,9 +213,14 @@
 		return null
 	return ballistic_gun.magazine
 
-/// Sets how many rounds the internal magazine holds before any magazine part, such as when the scrap revolver changes caliber.
+/// Sets how many rounds the internal magazine holds before any magazine part.
 /datum/component/blood_brother_gun/proc/set_base_capacity(new_capacity)
 	base_capacity = new_capacity
+	update_magazine()
+
+/// Sets the multiplier applied to the internal magazine's total capacity, such as when the scrap revolver switches to shotgun shells.
+/datum/component/blood_brother_gun/proc/set_capacity_multiplier(new_multiplier)
+	capacity_multiplier = new_multiplier
 	update_magazine()
 
 /// Applies the installed magazine part's capacity and weight to the gun, replacing those of the previous magazine.
@@ -225,7 +232,8 @@
 	var/obj/item/ammo_box/magazine/internal/internal_magazine = get_internal_magazine()
 	if(!internal_magazine || isnull(base_capacity))
 		return
-	internal_magazine.max_ammo = base_capacity + (magazine_part ? magazine_part.bb_extra_rounds : 0)
+	var/total_capacity = (base_capacity + (magazine_part ? magazine_part.bb_extra_rounds : 0)) * capacity_multiplier
+	internal_magazine.max_ammo = max(round(total_capacity), 1)
 	resize_internal_magazine(internal_magazine)
 
 /// Applies the combined size change of the installed magazine, barrel and underbarrel, replacing the previous change.

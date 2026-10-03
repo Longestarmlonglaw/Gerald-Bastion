@@ -6,8 +6,8 @@
 
 /// How many .38 rounds the scrap revolver's cylinder holds, before any magazine part.
 #define SCRAP_REVOLVER_38_CAPACITY 6
-/// How many 12 gauge shells the scrap revolver's cylinder holds, before any magazine part.
-#define SCRAP_REVOLVER_SHOTGUN_CAPACITY 3
+/// In shotgun mode, the cylinder holds this fraction of its .38 capacity, magazine part included.
+#define SCRAP_REVOLVER_SHOTGUN_CAPACITY_MULTIPLIER 0.5
 
 /obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap
 	name = "scrap revolver cylinder"
@@ -15,7 +15,6 @@
 	caliber = CALIBER_38
 	max_ammo = SCRAP_REVOLVER_38_CAPACITY
 	start_empty = TRUE
-	multiload = FALSE
 
 	/// Whether the cylinder is set up for 12 gauge shells instead of .38 rounds. Switched with a wrench.
 	var/shotgun_mode = FALSE
@@ -75,19 +74,19 @@
 	if(!I.use_tool(src, user, 3 SECONDS))
 		return TRUE
 
-	var/new_base_capacity
+	var/new_capacity_multiplier
 	cylinder.shotgun_mode = !cylinder.shotgun_mode
 	if(cylinder.shotgun_mode)
 		cylinder.ammo_type = /obj/item/ammo_casing/shotgun
 		cylinder.caliber = CALIBER_SHOTGUN
-		new_base_capacity = SCRAP_REVOLVER_SHOTGUN_CAPACITY
+		new_capacity_multiplier = SCRAP_REVOLVER_SHOTGUN_CAPACITY_MULTIPLIER
 		base_icon_state = "revolver_scrap_shotgun"
 		fire_sound = 'sound/weapons/gun/shotgun/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for 12 gauge shotgun shells."))
 	else
 		cylinder.ammo_type = /obj/item/ammo_casing/c38
 		cylinder.caliber = CALIBER_38
-		new_base_capacity = SCRAP_REVOLVER_38_CAPACITY
+		new_capacity_multiplier = 1
 		base_icon_state = "revolver_scrap_c38"
 		fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
 		to_chat(user, span_notice("You reconfigure [src]'s cylinder for .38 rounds."))
@@ -98,9 +97,9 @@
 	cylinder.stored_ammo = list()
 	for(var/obj/item/ammo_casing/spent_casing as anything in spent_casings)
 		spent_casing.forceMove(drop_location())
-	// The gun component adds any magazine part's extra rounds on top of the new base capacity.
+	// The gun component works out the new capacity, including any magazine part's extra rounds.
 	var/datum/component/blood_brother_gun/modular_gun = GetComponent(/datum/component/blood_brother_gun)
-	modular_gun.set_base_capacity(new_base_capacity)
+	modular_gun.set_capacity_multiplier(new_capacity_multiplier)
 	update_appearance()
 
 /obj/item/gun/ballistic/revolver/blood_brother_scrap/Initialize(mapload)
@@ -112,4 +111,4 @@
 	)
 
 #undef SCRAP_REVOLVER_38_CAPACITY
-#undef SCRAP_REVOLVER_SHOTGUN_CAPACITY
+#undef SCRAP_REVOLVER_SHOTGUN_CAPACITY_MULTIPLIER
