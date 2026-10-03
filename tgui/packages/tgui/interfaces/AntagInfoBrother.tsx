@@ -454,7 +454,8 @@ const GUIDE_TOPICS: GuideTopic[] = [
         </Box>
         <Box mb={1}>
           To install a part, use it on the weapon. To remove one,{' '}
-          <b>alt-right-click</b> the weapon while holding it.
+          <b>alt-right-click</b> the weapon while holding it and pick the part
+          from the menu.
         </Box>
         <Box mb={1}>
           A weapon can't fire without a <b>receiver</b>. Receivers determine the
@@ -466,6 +467,13 @@ const GUIDE_TOPICS: GuideTopic[] = [
           <b>Ballistic</b> weapons must be fully unloaded before you change
           their parts. <b>Energy</b> weapons can be modified at any time, but
           adding or removing a power cell drains them to zero charge.
+        </Box>
+        <Box mb={1}>
+          <b>Underbarrels</b> give your weapon an extra trick. Once one is
+          installed, <b>right-click</b> handles everything it does: right-click
+          the weapon with an item to load it, and right-click with the weapon to
+          fire it. To unload one without firing, remove it and use it in your
+          hand.
         </Box>
         <Box>
           Not every blood brother weapon is modular. The ones that can't be
