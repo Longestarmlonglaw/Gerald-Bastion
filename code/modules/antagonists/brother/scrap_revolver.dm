@@ -9,7 +9,7 @@
 /// In shotgun mode, the cylinder holds this fraction of its .38 capacity, magazine part included.
 #define SCRAP_REVOLVER_SHOTGUN_CAPACITY_MULTIPLIER 0.5
 
-/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap
+/obj/item/ammo_box/magazine/internal/cylinder/scrap
 	name = "scrap revolver cylinder"
 	ammo_type = /obj/item/ammo_casing/c38
 	caliber = CALIBER_38
@@ -19,7 +19,7 @@
 	/// Whether the cylinder is set up for 12 gauge shells instead of .38 rounds. Switched with a wrench.
 	var/shotgun_mode = FALSE
 
-/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/Initialize(mapload)
+/obj/item/ammo_box/magazine/internal/cylinder/scrap/Initialize(mapload)
 	. = ..()
 	// Cylinders need one slot per chamber so the cylinder-specific give_round()
 	// proc has empty chambers to place ammunition into.
@@ -27,21 +27,21 @@
 	for(var/i in 1 to max_ammo)
 		stored_ammo += null
 
-/obj/item/gun/ballistic/revolver/blood_brother_scrap
+/obj/item/gun/ballistic/revolver/scrap
 	name = "scrap revolver"
 	desc = "A crude revolver cobbled together from whatever parts were available. Its matter-bin cylinder can be configured for .38 rounds or 12 gauge shells."
 	icon_state = "revolver_scrap_c38"
 	base_icon_state = "revolver_scrap_c38"
 	inhand_icon_state = "gun"
-	accepted_magazine_type = /obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap
+	accepted_magazine_type = /obj/item/ammo_box/magazine/internal/cylinder/scrap
 	fire_sound = 'sound/weapons/gun/revolver/shot.ogg'
 	w_class = WEIGHT_CLASS_SMALL
 	pinless = TRUE
 	spawnwithmagazine = TRUE
 
-/obj/item/gun/ballistic/revolver/blood_brother_scrap/examine(mob/user)
+/obj/item/gun/ballistic/revolver/scrap/examine(mob/user)
 	. = ..()
-	var/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/cylinder = magazine
+	var/obj/item/ammo_box/magazine/internal/cylinder/scrap/cylinder = magazine
 	if(cylinder?.shotgun_mode)
 		. += span_notice("The cylinder is configured for 12 gauge shotgun shells. It holds up to [cylinder.max_ammo] shells.")
 	else if(cylinder)
@@ -49,7 +49,7 @@
 	. += span_warning("Do not wrench the cylinder while live ammunition is loaded.")
 
 /// Wrenching the revolver switches its cylinder between .38 and 12 gauge. It has to be unloaded first, or a round goes off.
-/obj/item/gun/ballistic/revolver/blood_brother_scrap/wrench_act(mob/living/user, obj/item/I)
+/obj/item/gun/ballistic/revolver/scrap/wrench_act(mob/living/user, obj/item/I)
 	if(!user.is_holding(src))
 		balloon_alert(user, "hold to modify!")
 		return TRUE
@@ -65,7 +65,7 @@
 			)
 		return TRUE
 
-	var/obj/item/ammo_box/magazine/internal/cylinder/blood_brother_scrap/cylinder = magazine
+	var/obj/item/ammo_box/magazine/internal/cylinder/scrap/cylinder = magazine
 	if(!cylinder)
 		return TRUE
 
@@ -102,7 +102,7 @@
 	modular_gun.set_capacity_multiplier(new_capacity_multiplier)
 	update_appearance()
 
-/obj/item/gun/ballistic/revolver/blood_brother_scrap/Initialize(mapload)
+/obj/item/gun/ballistic/revolver/scrap/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/blood_brother_gun, \
 		weapon_family = BB_GUN_BALLISTIC, \

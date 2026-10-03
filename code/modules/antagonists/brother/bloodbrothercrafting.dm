@@ -439,7 +439,7 @@
 	name = "Scrap Revolver"
 	desc = "A crude revolver built around a matter-bin cylinder that can be configured for .38 rounds or 12 gauge shells."
 	category = CAT_BB_WEAPONS
-	result = /obj/item/gun/ballistic/revolver/blood_brother_scrap
+	result = /obj/item/gun/ballistic/revolver/scrap
 	reqs = list(
 		/obj/item/stock_parts/matter_bin = 1,
 		/obj/item/weaponcrafting/receiver = 1,

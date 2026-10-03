@@ -233,7 +233,8 @@
 	if(!internal_magazine || isnull(base_capacity))
 		return
 	var/total_capacity = (base_capacity + (magazine_part ? magazine_part.bb_extra_rounds : 0)) * capacity_multiplier
-	internal_magazine.max_ammo = max(round(total_capacity), 1)
+	// A multiplier can leave a fraction (4.5 shells), so round down to a whole round, and always hold at least one.
+	internal_magazine.max_ammo = max(FLOOR(total_capacity, 1), 1)
 	resize_internal_magazine(internal_magazine)
 
 /// Applies the combined size change of the installed magazine, barrel and underbarrel, replacing the previous change.
