@@ -118,14 +118,58 @@
 		/obj/item/firing_pin = 1,
 	)
 
-/datum/crafting_recipe/blood_brother/barrel_part
-	name = "Barrel"
-	desc = "An improvised ballistic barrel."
+/datum/crafting_recipe/blood_brother/long_barrel
+	name = "Long Barrel"
+	desc = "Your rounds deal more damage and pierce more armor, but the weapon gets one size bigger."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/barrel
+	result = /obj/item/blood_brother_gun_part/barrel/long
+	reqs = list(
+		/obj/item/pipe = 2,
+		/obj/item/stack/sheet/iron = 5,
+	)
+	tool_behaviors = list(
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/shortened_barrel
+	name = "Shortened Barrel"
+	desc = "Makes your weapon one size smaller and easier to hide, but your rounds spread out a lot more."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/barrel/shortened
 	reqs = list(
 		/obj/item/pipe = 1,
 	)
+	tool_behaviors = list(
+		TOOL_SAW,
+	)
+
+/datum/crafting_recipe/blood_brother/lucky_barrel
+	name = "Lucky Barrel"
+	desc = "Rounds that fire a single projectile, like slugs and revolver rounds, have a chance to crit for double damage. Buckshot and other pellet rounds don't benefit."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/barrel/lucky
+	reqs = list(
+		/obj/item/pipe = 1,
+		/obj/item/dice = 2,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/choke
+	name = "Choke"
+	desc = "Tightens your weapon's grouping, reducing buckshot pellet spread, the inaccuracy of single rounds, and the penalty for dual wielding."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/barrel/choke
+	reqs = list(
+		/obj/item/pipe = 1,
+		/obj/item/stack/sheet/plasteel = 2,
+	)
+	tool_behaviors = list(
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
 
 /datum/crafting_recipe/blood_brother/upgraded_cell
 	name = "Upgraded Cell"
@@ -186,22 +230,127 @@
 	)
 	time = 10 SECONDS
 
-/datum/crafting_recipe/blood_brother/lens_part
-	name = "Lens"
-	desc = "An improvised energy weapon lens."
+/datum/crafting_recipe/blood_brother/spray_lens
+	name = "Spray Lens"
+	desc = "Your energy weapon fires faster, armor-piercing, power-efficient shots, but they deal less damage and spread out a lot more."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/lens
+	result = /obj/item/blood_brother_gun_part/lens/spray
 	reqs = list(
 		/obj/item/stock_parts/scanning_module = 1,
+		/obj/item/stack/sheet/glass = 5,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
 	)
 
-/datum/crafting_recipe/blood_brother/underbarrel_part
-	name = "Underbarrel"
-	desc = "An improvised underbarrel component for a Blood Brother weapon."
+/datum/crafting_recipe/blood_brother/spray_lens/New()
+	. = ..()
+	// Only accept a basic scanning module, so better ones never get used up by mistake.
+	blacklist |= typesof(/obj/item/stock_parts/scanning_module) - /obj/item/stock_parts/scanning_module
+
+/datum/crafting_recipe/blood_brother/efficiency_lens
+	name = "Efficiency Lens"
+	desc = "Get a lot more shots out of your energy weapon by lowering the power each shot uses, at the cost of some damage."
 	category = CAT_BB_PARTS
-	result = /obj/item/blood_brother_gun_part/underbarrel
+	result = /obj/item/blood_brother_gun_part/lens/efficiency
 	reqs = list(
-		/obj/item/ammo_box/magazine/smgm45 = 1,
+		/obj/item/stock_parts/scanning_module/adv = 1,
+		/obj/item/stack/sheet/glass = 5,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+	)
+
+/datum/crafting_recipe/blood_brother/densifying_lens
+	name = "Densifying Lens"
+	desc = "Your energy weapon fires slower, slower-moving shots that deal more damage and knock their target down."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/lens/densifying
+	reqs = list(
+		/obj/item/stock_parts/scanning_module/phasic = 1,
+		/obj/item/stack/sheet/plasteel = 2,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/bluespace_lens
+	name = "Bluespace Lens"
+	desc = "Shots deal more damage, fly faster, and can teleport whoever they hit, but each one uses more power and your energy weapon fires more slowly."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/lens/bluespace
+	reqs = list(
+		/obj/item/stock_parts/scanning_module/triphasic = 1,
+		/obj/item/stack/ore/bluespace_crystal = 3,
+		/obj/item/stack/sheet/mineral/diamond = 1,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_MULTITOOL,
+	)
+	time = 15 SECONDS
+
+/datum/crafting_recipe/blood_brother/crude_launcher
+	name = "Crude Launcher"
+	desc = "A pneumatic underbarrel that launches one loaded item, like a knife or a bola, when you right-click with your weapon. Bullets won't fire from it, and grenades don't fit."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/underbarrel/launcher
+	reqs = list(
+		/obj/item/pipe = 1,
+		/obj/item/tank/internals/emergency_oxygen = 1,
+		/obj/item/stack/sheet/iron = 5,
+	)
+	tool_behaviors = list(
+		TOOL_WRENCH,
+		TOOL_WELDER,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/grenade_launcher
+	name = "Underbarrel Grenade Launcher"
+	desc = "Holds one grenade of any kind and fires it on a short fuse when you right-click with your weapon. Pairs nicely with smoke grenades, flashbangs and chemical grenades."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/underbarrel/grenade_launcher
+	reqs = list(
+		/obj/item/pipe = 1,
+		/obj/item/assembly/igniter = 1,
+		/obj/item/stack/sheet/plasteel = 3,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WELDER,
+	)
+	time = 10 SECONDS
+
+/datum/crafting_recipe/blood_brother/saw_blade
+	name = "Saw Blade"
+	desc = "Turns your weapon's melee attack into a vicious cutting one, but makes it one size bigger."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/underbarrel/saw_blade
+	reqs = list(
+		/obj/item/stack/sheet/plasteel = 2,
+		/obj/item/stack/sheet/iron = 5,
+	)
+	tool_behaviors = list(
+		TOOL_WELDER,
+		TOOL_SAW,
+	)
+	time = 5 SECONDS
+
+/datum/crafting_recipe/blood_brother/scrap_foregrip
+	name = "Scrap Foregrip"
+	desc = "A retractable handle that steadies your aim and makes dual wielding much easier, with no downside."
+	category = CAT_BB_PARTS
+	result = /obj/item/blood_brother_gun_part/underbarrel/foregrip
+	reqs = list(
+		/obj/item/stack/sheet/iron = 5,
+		/obj/item/stack/cable_coil = 5,
+	)
+	tool_behaviors = list(
+		TOOL_SCREWDRIVER,
+		TOOL_WRENCH,
 	)
 
 /datum/crafting_recipe/blood_brother/toolset_implant

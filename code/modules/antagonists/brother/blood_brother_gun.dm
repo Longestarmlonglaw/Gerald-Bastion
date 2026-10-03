@@ -3,7 +3,8 @@
  *
  * Tracks the upgrade slots a Blood Brother weapon exposes and the parts installed in them,
  * and applies their effects to the gun: receivers change damage, speed and fire rate,
- * magazines change an internal magazine's capacity, and power cells change an energy gun's cell.
+ * magazines change an internal magazine's capacity, power cells change an energy gun's cell,
+ * lenses change an energy gun's shots, and barrels change a ballistic gun's shots.
  *
  * Add it to a gun with AddComponent(), listing its weapon family, slots and any default parts.
  * The part types and their stats live in bloodbrothergunparts.dm.
@@ -25,14 +26,24 @@
 	var/added_autofire = FALSE
 	/// How many rounds the gun's internal magazine holds before any magazine part. Null if it has no internal magazine.
 	var/base_capacity
-	/// How many weight classes the current magazine part has added to the gun.
-	var/applied_weight_class_increase = 0
+	/// How many weight classes the current magazine and barrel have added to the gun. Can be negative.
+	var/applied_weight_class_change = 0
 	/// Whether someone is currently loading ammunition through a magazine with a load delay.
 	var/loading = FALSE
 	/// How much charge the energy gun's cell holds before any power cell part. Null if it isn't an energy gun.
 	var/base_cell_maxcharge
 	/// Whether the gun's self-charging was turned on by the current power cell part.
 	var/added_selfcharge = FALSE
+	/// The gun's spread before any parts.
+	var/base_spread
+	/// The gun's extra dual wielding spread before any parts.
+	var/base_dual_wield_spread
+	/// The gun's melee damage before any underbarrel.
+	var/base_force
+	/// The gun's melee sharpness before any underbarrel.
+	var/base_sharpness
+	/// The gun's melee hit sound before any underbarrel.
+	var/base_hitsound
 
 /datum/component/blood_brother_gun/Initialize(weapon_family, list/part_slots, list/default_parts)
 	if(!isgun(parent))
@@ -42,6 +53,11 @@
 	src.weapon_family = weapon_family
 	src.part_slots = part_slots
 	base_fire_delay = gun.fire_delay
+	base_spread = gun.spread
+	base_dual_wield_spread = gun.dual_wield_spread
+	base_force = gun.force
+	base_sharpness = gun.sharpness
+	base_hitsound = gun.hitsound
 	var/obj/item/ammo_box/magazine/internal/internal_magazine = get_internal_magazine()
 	if(internal_magazine)
 		base_capacity = internal_magazine.max_ammo
@@ -53,7 +69,10 @@
 		var/obj/item/blood_brother_gun_part/part = new part_type(gun)
 		LAZYSET(installed_parts, part.bb_part_slot, part)
 	// Apply every default part's effects. Unlike on_part_changed(), this doesn't drain the gun's cell.
-	update_receiver()
+	// update_lens() and update_barrel() both reapply the receiver.
+	update_lens()
+	update_barrel()
+	update_underbarrel()
 	update_magazine()
 	update_power_cell()
 
@@ -69,8 +88,22 @@
 	RegisterSignal(parent, COMSIG_ATOM_ATTACKBY, PROC_REF(on_attackby))
 	RegisterSignal(parent, COMSIG_ATOM_EMP_ACT, PROC_REF(on_emp))
 	RegisterSignal(parent, COMSIG_GUN_FIRED, PROC_REF(on_fired))
+	RegisterSignal(parent, COMSIG_PROJECTILE_BEFORE_FIRE, PROC_REF(on_projectile_before_fire))
+	// Right-clicking with the gun fires a firing underbarrel, both up close and at range.
+	RegisterSignals(parent, list(COMSIG_ITEM_INTERACTING_WITH_ATOM_SECONDARY, COMSIG_RANGED_ITEM_INTERACTING_WITH_ATOM_SECONDARY), PROC_REF(on_secondary_fire))
+	// Right-clicking the gun with an item loads it into a firing underbarrel.
+	RegisterSignal(parent, COMSIG_ATOM_ITEM_INTERACTION_SECONDARY, PROC_REF(on_secondary_item_interaction))
+	// Each energy firing mode readies a fresh projectile every shot, which is where the lens's per-shot effects get added.
+	var/obj/item/gun/energy/energy_gun = parent
+	if(istype(energy_gun))
+		for(var/obj/item/ammo_casing/energy/shot in energy_gun.ammo_type)
+			RegisterSignal(shot, COMSIG_CASING_READY_PROJECTILE, PROC_REF(on_ready_projectile))
 
 /datum/component/blood_brother_gun/UnregisterFromParent()
+	var/obj/item/gun/energy/energy_gun = parent
+	if(istype(energy_gun))
+		for(var/obj/item/ammo_casing/energy/shot in energy_gun.ammo_type)
+			UnregisterSignal(shot, COMSIG_CASING_READY_PROJECTILE)
 	UnregisterSignal(parent, list(
 		COMSIG_ATOM_EXAMINE,
 		COMSIG_ATOM_EXITED,
@@ -79,6 +112,10 @@
 		COMSIG_ATOM_ATTACKBY,
 		COMSIG_ATOM_EMP_ACT,
 		COMSIG_GUN_FIRED,
+		COMSIG_PROJECTILE_BEFORE_FIRE,
+		COMSIG_ITEM_INTERACTING_WITH_ATOM_SECONDARY,
+		COMSIG_RANGED_ITEM_INTERACTING_WITH_ATOM_SECONDARY,
+		COMSIG_ATOM_ITEM_INTERACTION_SECONDARY,
 	))
 
 /// Returns the part installed in the given slot, if any.
@@ -159,6 +196,12 @@
 			update_receiver()
 		if(BB_GUN_PART_MAGAZINE)
 			update_magazine()
+		if(BB_GUN_PART_LENS)
+			update_lens()
+		if(BB_GUN_PART_BARREL)
+			update_barrel()
+		if(BB_GUN_PART_UNDERBARREL)
+			update_underbarrel()
 	gun.update_appearance()
 
 /// Returns the gun's internal magazine, if it has one. Magazine parts only work on internal magazines.
@@ -175,19 +218,33 @@
 
 /// Applies the installed magazine part's capacity and weight to the gun, replacing those of the previous magazine.
 /datum/component/blood_brother_gun/proc/update_magazine()
-	var/obj/item/gun/gun = parent
 	var/obj/item/blood_brother_gun_part/magazine/magazine_part = get_part(BB_GUN_PART_MAGAZINE)
 
-	var/new_weight_class_increase = magazine_part ? magazine_part.bb_weight_class_increase : 0
-	if(new_weight_class_increase != applied_weight_class_increase)
-		gun.update_weight_class(gun.w_class - applied_weight_class_increase + new_weight_class_increase)
-		applied_weight_class_increase = new_weight_class_increase
+	update_weight_class()
 
 	var/obj/item/ammo_box/magazine/internal/internal_magazine = get_internal_magazine()
 	if(!internal_magazine || isnull(base_capacity))
 		return
 	internal_magazine.max_ammo = base_capacity + (magazine_part ? magazine_part.bb_extra_rounds : 0)
 	resize_internal_magazine(internal_magazine)
+
+/// Applies the combined size change of the installed magazine, barrel and underbarrel, replacing the previous change.
+/datum/component/blood_brother_gun/proc/update_weight_class()
+	var/obj/item/gun/gun = parent
+	var/obj/item/blood_brother_gun_part/magazine/magazine_part = get_part(BB_GUN_PART_MAGAZINE)
+	var/obj/item/blood_brother_gun_part/barrel/barrel = get_part(BB_GUN_PART_BARREL)
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+
+	var/new_change = (magazine_part ? magazine_part.bb_weight_class_increase : 0) \
+		+ (barrel ? barrel.bb_weight_class_change : 0) \
+		+ (underbarrel ? underbarrel.bb_weight_class_change : 0)
+	if(new_change == applied_weight_class_change)
+		return
+	var/base_w_class = gun.w_class - applied_weight_class_change
+	// Never shrink the gun below tiny or grow it past huge.
+	var/new_w_class = clamp(base_w_class + new_change, WEIGHT_CLASS_TINY, WEIGHT_CLASS_HUGE)
+	gun.update_weight_class(new_w_class)
+	applied_weight_class_change = new_w_class - base_w_class
 
 /// Makes the internal magazine's stored rounds fit its current capacity, dropping anything that no longer fits.
 /datum/component/blood_brother_gun/proc/resize_internal_magazine(obj/item/ammo_box/magazine/internal/internal_magazine)
@@ -256,15 +313,18 @@
 	// Pulse from the turf rather than the gun, so it still works while the gun is held or worn.
 	radiation_pulse(get_turf(energy_gun), max_range = 2, threshold = RAD_LIGHT_INSULATION, chance = 20)
 
-/// Applies the installed receiver's stats to the gun, replacing those of the previous receiver.
+/// Applies the installed receiver's, lens's and barrel's damage, speed and fire rate to the gun, replacing those of the previous parts.
 /datum/component/blood_brother_gun/proc/update_receiver()
 	var/obj/item/gun/gun = parent
 	var/obj/item/blood_brother_gun_part/receiver/receiver = get_part(BB_GUN_PART_RECEIVER)
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+	var/obj/item/blood_brother_gun_part/barrel/barrel = get_part(BB_GUN_PART_BARREL)
 
+	// The receiver's, lens's and barrel's multipliers all stack.
 	gun.projectile_damage_multiplier /= applied_damage_multiplier
 	gun.projectile_speed_multiplier /= applied_speed_multiplier
-	applied_damage_multiplier = receiver ? receiver.bb_damage_multiplier : 1
-	applied_speed_multiplier = receiver ? receiver.bb_projectile_speed_multiplier : 1
+	applied_damage_multiplier = (receiver ? receiver.bb_damage_multiplier : 1) * (lens ? lens.bb_damage_multiplier : 1) * (barrel ? barrel.bb_damage_multiplier : 1)
+	applied_speed_multiplier = (receiver ? receiver.bb_projectile_speed_multiplier : 1) * (lens ? lens.bb_projectile_speed_multiplier : 1)
 	gun.projectile_damage_multiplier *= applied_damage_multiplier
 	gun.projectile_speed_multiplier *= applied_speed_multiplier
 
@@ -274,14 +334,142 @@
 		qdel(gun.GetComponent(/datum/component/automatic_fire))
 		added_autofire = FALSE
 	if(receiver?.bb_receiver_type == BB_GUN_RECEIVER_AUTOMATIC)
-		gun.AddComponent(/datum/component/automatic_fire, receiver.bb_fire_interval)
+		gun.AddComponent(/datum/component/automatic_fire, receiver.bb_fire_interval * get_fire_delay_multiplier())
 		added_autofire = TRUE
 
-/// Sets the gun's delay between shots to the receiver's, or back to the gun's own if the receiver doesn't change it.
+/// Sets the gun's delay between shots from the receiver (or the gun's own delay), adjusted by the lens.
 /datum/component/blood_brother_gun/proc/update_fire_delay()
 	var/obj/item/gun/gun = parent
 	var/obj/item/blood_brother_gun_part/receiver/receiver = get_part(BB_GUN_PART_RECEIVER)
-	gun.fire_delay = receiver?.bb_fire_interval || get_base_fire_delay()
+	gun.fire_delay = (receiver?.bb_fire_interval || get_base_fire_delay()) * get_fire_delay_multiplier()
+
+/// Returns how much the installed lens slows down or speeds up the gun's firing.
+/datum/component/blood_brother_gun/proc/get_fire_delay_multiplier()
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+	return lens ? lens.bb_fire_delay_multiplier : 1
+
+/// Applies the installed lens's effects to the gun, replacing those of the previous lens.
+/// Damage, speed and fire rate are handled with the receiver, armour penetration, knockdown and teleporting in on_ready_projectile().
+/datum/component/blood_brother_gun/proc/update_lens()
+	var/obj/item/gun/gun = parent
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+
+	update_receiver()
+	update_spread()
+
+	// Each firing mode's shot cost is reset from its original value, so lenses never stack.
+	var/obj/item/gun/energy/energy_gun = gun
+	if(!istype(energy_gun))
+		return
+	var/cost_multiplier = lens ? lens.bb_energy_cost_multiplier : 1
+	for(var/obj/item/ammo_casing/energy/shot in energy_gun.ammo_type)
+		shot.e_cost = initial(shot.e_cost) * cost_multiplier
+	energy_gun.update_appearance()
+
+/// Applies the installed barrel's effects to the gun, replacing those of the previous barrel.
+/// Armour penetration and crits are added to each projectile in on_projectile_before_fire(), and the choke's tighter grouping in on_fired().
+/datum/component/blood_brother_gun/proc/update_barrel()
+	update_receiver()
+	update_weight_class()
+	update_spread()
+
+/// Sets the gun's spread and dual wielding spread from its own values, adjusted by the installed lens, barrel and underbarrel.
+/datum/component/blood_brother_gun/proc/update_spread()
+	var/obj/item/gun/gun = parent
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+	var/obj/item/blood_brother_gun_part/barrel/barrel = get_part(BB_GUN_PART_BARREL)
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+
+	var/extra_spread = (lens ? lens.bb_spread : 0) + (barrel ? barrel.bb_spread : 0)
+	var/spread_multiplier = (barrel ? barrel.bb_spread_multiplier : 1) * (underbarrel ? underbarrel.bb_spread_multiplier : 1)
+	var/dual_wield_multiplier = (barrel ? barrel.bb_dual_wield_spread_multiplier : 1) * (underbarrel ? underbarrel.bb_dual_wield_spread_multiplier : 1)
+	gun.spread = (base_spread + extra_spread) * spread_multiplier
+	gun.dual_wield_spread = base_dual_wield_spread * dual_wield_multiplier
+
+/// Applies the installed underbarrel's effects to the gun, replacing those of the previous underbarrel.
+/// Firing and loading are handled in on_secondary_fire() and on_secondary_item_interaction().
+/datum/component/blood_brother_gun/proc/update_underbarrel()
+	var/obj/item/gun/gun = parent
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+
+	update_weight_class()
+	update_spread()
+
+	if(underbarrel?.bb_melee_force)
+		gun.force = underbarrel.bb_melee_force
+		gun.sharpness = SHARP_EDGED
+		gun.hitsound = 'sound/weapons/bladeslice.ogg'
+	else
+		gun.force = base_force
+		gun.sharpness = base_sharpness
+		gun.hitsound = base_hitsound
+
+/// Right-clicking with the gun fires a firing underbarrel, instead of bashing or holding someone up.
+/datum/component/blood_brother_gun/proc/on_secondary_fire(obj/item/gun/source, mob/living/user, atom/target, list/modifiers)
+	SIGNAL_HANDLER
+
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+	if(!underbarrel?.bb_fires || target == user)
+		return NONE
+	// Only fire at things out in the world, not at items in someone's inventory.
+	if(!isturf(target) && !isturf(target.loc))
+		return NONE
+	INVOKE_ASYNC(underbarrel, TYPE_PROC_REF(/obj/item/blood_brother_gun_part/underbarrel, fire_at), target, user, source)
+	return ITEM_INTERACT_SUCCESS
+
+/// Right-clicking the gun with an item loads it into a firing underbarrel.
+/datum/component/blood_brother_gun/proc/on_secondary_item_interaction(obj/item/gun/source, mob/living/user, obj/item/tool, list/modifiers)
+	SIGNAL_HANDLER
+
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+	if(!underbarrel?.bb_fires)
+		return NONE
+	underbarrel.try_load(tool, user)
+	return ITEM_INTERACT_BLOCKING
+
+/// Adds the barrel's armour penetration and crits to each projectile the gun fires, including every buckshot pellet.
+/datum/component/blood_brother_gun/proc/on_projectile_before_fire(obj/item/gun/source, obj/projectile/projectile, atom/original_target)
+	SIGNAL_HANDLER
+
+	var/obj/item/blood_brother_gun_part/barrel/barrel = get_part(BB_GUN_PART_BARREL)
+	if(!barrel)
+		return
+	projectile.armour_penetration += barrel.bb_armour_penetration
+	// Crits only apply to rounds that fire a single projectile, so buckshot can't crit, but slugs and revolver rounds can.
+	// The round being fired is still chambered while its projectiles launch.
+	if(barrel.bb_crit_chance && source.chambered?.pellets == 1 && prob(barrel.bb_crit_chance))
+		projectile.damage *= 2
+		RegisterSignal(projectile, COMSIG_PROJECTILE_SELF_ON_HIT, PROC_REF(on_crit_hit))
+
+/// Lets the shooter know when one of their crits lands.
+/datum/component/blood_brother_gun/proc/on_crit_hit(obj/projectile/source, atom/movable/firer, atom/target, angle, hit_limb, blocked)
+	SIGNAL_HANDLER
+
+	if(ismob(firer) && isliving(target))
+		target.balloon_alert(firer, "critical hit!")
+
+/// Adds the lens's armour penetration, knockdown and teleporting to each shot as it's fired.
+/datum/component/blood_brother_gun/proc/on_ready_projectile(obj/item/ammo_casing/source, atom/target, mob/living/user, quiet, zone_override, atom/fired_from)
+	SIGNAL_HANDLER
+
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+	var/obj/projectile/shot = source.loaded_projectile
+	if(!lens || !shot)
+		return
+	shot.armour_penetration += lens.bb_armour_penetration
+	if(lens.bb_knockdown)
+		shot.knockdown = max(shot.knockdown, lens.bb_knockdown)
+	if(lens.bb_teleport_chance)
+		RegisterSignal(shot, COMSIG_PROJECTILE_SELF_ON_HIT, PROC_REF(on_teleporting_shot_hit))
+
+/// Bluespace lens shots have a chance to teleport the mob they hit a short distance.
+/datum/component/blood_brother_gun/proc/on_teleporting_shot_hit(obj/projectile/source, atom/movable/firer, atom/target, angle, hit_limb, blocked)
+	SIGNAL_HANDLER
+
+	var/obj/item/blood_brother_gun_part/lens/lens = get_part(BB_GUN_PART_LENS)
+	if(!isliving(target) || !lens || !prob(lens.bb_teleport_chance))
+		return
+	do_teleport(target, get_turf(target), 4, channel = TELEPORT_CHANNEL_BLUESPACE)
 
 /// Returns the gun's own delay between shots, ignoring any receiver.
 /datum/component/blood_brother_gun/proc/get_base_fire_delay()
@@ -302,6 +490,9 @@
 		examine_list += span_notice("[capitalize(slot)]: [part ? part.name : "empty"]")
 	if(get_unstable_cell())
 		examine_list += span_warning("Its unstable cell can be recharged by feeding it <b>uranium sheets</b>.")
+	var/obj/item/blood_brother_gun_part/underbarrel/underbarrel = get_part(BB_GUN_PART_UNDERBARREL)
+	if(underbarrel?.bb_fires)
+		examine_list += span_notice("<b>Right-click</b> the weapon with an item to load its [underbarrel.name], and <b>right-click</b> with it to fire. It's [underbarrel.loaded_item ? "loaded with [underbarrel.loaded_item]" : "empty"].")
 
 /// Keeps the installed parts in sync if one leaves the gun by any means.
 /datum/component/blood_brother_gun/proc/on_exited(datum/source, atom/movable/gone, direction)
@@ -392,14 +583,21 @@
 		energy_gun.visible_message(span_danger("[energy_gun]'s unstable cell violently discharges!"))
 	return NONE
 
-/// Unstable cells sometimes spark and leak radiation when the gun fires a shot.
+/// Applies the barrel's tighter grouping to the round about to be fired, and makes unstable cells sometimes spark and leak radiation.
 /datum/component/blood_brother_gun/proc/on_fired(obj/item/gun/source, mob/living/user, atom/target, params, zone_override)
 	SIGNAL_HANDLER
 
-	if(!get_unstable_cell())
-		return
 	// This signal is sent on every trigger pull, even while the gun is cooling down or has nothing to fire, so ignore those.
 	if(source.semicd || !source.chambered?.loaded_projectile)
+		return
+
+	// A round's inaccuracy, including buckshot pellet spread, comes from its variance.
+	// It's always set from the round's original value, so it can't stack.
+	var/obj/item/blood_brother_gun_part/barrel/barrel = get_part(BB_GUN_PART_BARREL)
+	if(barrel)
+		source.chambered.variance = initial(source.chambered.variance) * barrel.bb_spread_multiplier
+
+	if(!get_unstable_cell())
 		return
 	if(prob(25))
 		do_sparks(2, FALSE, source)
