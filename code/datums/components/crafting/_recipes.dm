@@ -23,6 +23,8 @@
 	var/list/chem_catalysts = list()
 	///where it shows up in the crafting UI
 	var/category
+	///Whether this recipe is only available through the Blood Brother crafting menu.
+	var/blood_brother_only = FALSE
 	///Set to FALSE if it needs to be learned first.
 	var/always_available = TRUE
 	///Required machines for the craft, set the assigned value of the typepath to CRAFTING_MACHINERY_CONSUME or CRAFTING_MACHINERY_USE. Lazy associative list: type_path key -> flag value.

@@ -369,11 +369,19 @@
 		qdel(DL)
 
 /datum/component/personal_crafting/proc/is_recipe_available(datum/crafting_recipe/recipe, mob/user)
+	if(recipe.blood_brother_only && !can_use_special_recipes(user))
+		return FALSE
 	if(!recipe.always_available && !(recipe.type in user?.mind?.learned_recipes)) //User doesn't actually know how to make this.
 		return FALSE
 	if (recipe.category == CAT_CULT && !IS_CULTIST(user)) // Skip blood cult recipes if not cultist
 		return FALSE
 	return TRUE
+
+/datum/component/personal_crafting/proc/can_use_special_recipes(mob/user)
+	return FALSE
+
+/datum/component/personal_crafting/proc/get_crafting_recipes()
+	return mode ? GLOB.cooking_recipes : GLOB.crafting_recipes
 
 /datum/component/personal_crafting/proc/component_ui_interact(atom/movable/screen/craft/image, location, control, params, user)
 	SIGNAL_HANDLER
@@ -388,8 +396,11 @@
 /datum/component/personal_crafting/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
-		ui = new(user, src, "PersonalCrafting", "Crafting")
+		ui = new(user, src, "PersonalCrafting", get_ui_title())
 		ui.open()
+
+/datum/component/personal_crafting/proc/get_ui_title()
+	return mode ? "Cooking" : "Crafting"
 
 /datum/component/personal_crafting/ui_data(mob/user)
 	var/list/data = list()
@@ -400,7 +411,7 @@
 
 	var/list/surroundings = get_surroundings(user)
 	var/list/craftability = list()
-	for(var/datum/crafting_recipe/recipe as anything in (mode ? GLOB.cooking_recipes : GLOB.crafting_recipes))
+	for(var/datum/crafting_recipe/recipe as anything in get_crafting_recipes())
 		if(!is_recipe_available(recipe, user))
 			continue
 		if(check_tools(user, recipe, surroundings) && check_contents(user, recipe, surroundings))
@@ -422,7 +433,7 @@
 		var/mob/living/carbon/carbon = user
 		data["diet"] = carbon.dna.species.get_species_diet()
 
-	for(var/datum/crafting_recipe/recipe as anything in (mode ? GLOB.cooking_recipes : GLOB.crafting_recipes))
+	for(var/datum/crafting_recipe/recipe as anything in get_crafting_recipes())
 		if(!is_recipe_available(recipe, user))
 			continue
 
@@ -481,7 +492,8 @@
 	switch(action)
 		if("make")
 			var/mob/user = usr
-			var/datum/crafting_recipe/crafting_recipe = locate(params["recipe"]) in (mode ? GLOB.cooking_recipes : GLOB.crafting_recipes)
+			var/list/available_recipes = get_crafting_recipes()
+			var/datum/crafting_recipe/crafting_recipe = locate(params["recipe"]) in available_recipes
 			busy = TRUE
 			ui_interact(user)
 			var/atom/movable/result = construct_item(user, crafting_recipe)

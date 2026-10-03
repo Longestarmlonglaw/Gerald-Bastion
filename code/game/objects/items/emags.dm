@@ -29,6 +29,72 @@
 		user.visible_message(span_notice("[user] shows you: [icon2html(src, viewers(user))] [name]."), span_notice("You show [src]."))
 	add_fingerprint(user)
 
+/obj/item/card/emag/improvised
+	name = "improvised cryptographic sequencer"
+	desc = "It's a card with some junk circuitry and a cracked screen strapped to it. It doesn't look very reliable and needs to be manually recharged with uranium sheets."
+	icon_state = "emag_makeshift"
+	var/charges = 5
+	var/max_charges = 5
+	var/emagging = FALSE
+
+/obj/item/card/emag/improvised/can_emag(atom/target, mob/user)
+	if(ismob(target) || istype(target, /obj/structure/chair))
+		to_chat(user, span_warning("[src] cannot interface with [target]."))
+		return FALSE
+	return ..()
+
+/obj/item/card/emag/improvised/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
+		return NONE
+	if(!can_emag(interacting_with, user))
+		return ITEM_INTERACT_BLOCKING
+	if(charges <= 0)
+		to_chat(user, span_warning("[src] is out of charges."))
+		return ITEM_INTERACT_BLOCKING
+	if(emagging)
+		return ITEM_INTERACT_BLOCKING
+
+	emagging = TRUE
+	if(!do_after(user, rand(5, 10) SECONDS, interacting_with))
+		emagging = FALSE
+		return ITEM_INTERACT_BLOCKING
+
+	charges--
+	if(prob(40))
+		to_chat(user, span_notice("[src] emits a puff of smoke, but nothing happens."))
+		emagging = FALSE
+		return ITEM_INTERACT_BLOCKING
+
+	if(prob(5))
+		user.adjust_fire_stacks(1)
+		user.ignite_mob()
+		to_chat(user, span_danger("The card shorts out and catches fire in your hands!"))
+
+	if(!emag_target(interacting_with, user))
+		charges++
+		to_chat(user, span_notice("[src] fails to emag [interacting_with]!"))
+
+	emagging = FALSE
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/card/emag/improvised/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!istype(tool, /obj/item/stack/sheet/mineral/uranium))
+		return NONE
+	if(charges >= max_charges)
+		balloon_alert(user, "already full!")
+		return ITEM_INTERACT_BLOCKING
+
+	var/obj/item/stack/sheet/mineral/uranium/uranium = tool
+	if(!uranium.use(1))
+		return ITEM_INTERACT_BLOCKING
+	charges++
+	to_chat(user, span_notice("You add another charge to [src]. It now has [charges] use[charges == 1 ? "" : "s"] remaining."))
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/card/emag/improvised/examine(mob/user)
+	. = ..()
+	. += span_notice("The charge meter indicates that it has [charges] charge[charges == 1 ? "" : "s"] remaining out of [max_charges] charges.")
+
 /obj/item/card/emag/bluespace
 	name = "bluespace cryptographic sequencer"
 	desc = "It's a blue card with a magnetic strip attached to some circuitry. It appears to have some sort of transmitter attached to it."
@@ -84,14 +150,19 @@
 /obj/item/card/emag/storage_insert_on_interaction(datum/storage, atom/storage_holder, mob/living/user)
 	return !(user.istate & ISTATE_HARM)
 
+/obj/item/card/emag/proc/emag_target(atom/target, mob/living/user)
+	log_combat(user, target, "attempted to emag")
+	if(target.emag_act(user, src))
+		SSblackbox.record_feedback("tally", "atom_emagged", 1, target.type)
+		return TRUE
+	return FALSE
+
 /obj/item/card/emag/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(SHOULD_SKIP_INTERACTION(interacting_with, src, user))
 		return NONE // lets us put things in bags without trying to emag them
 	if(!can_emag(interacting_with, user))
 		return ITEM_INTERACT_BLOCKING
-	log_combat(user, interacting_with, "attempted to emag")
-	if(interacting_with.emag_act(user, src))
-		SSblackbox.record_feedback("tally", "atom_emagged", 1, interacting_with.type)
+	if(emag_target(interacting_with, user))
 		return ITEM_INTERACT_SUCCESS
 	return NONE // In a perfect world this would be blocking, but this is not a perfect world
 
@@ -162,7 +233,7 @@
 	. = ..()
 	. += span_notice("It has [charges] charges remaining.")
 	if (length(charge_timers))
-		. += "[span_notice("<b>A small display on the back reads:")]</b>"
+		. += span_notice("<b>A small display on the back reads:</b>")
 	for (var/i in 1 to length(charge_timers))
 		var/timeleft = timeleft(charge_timers[i])
 		var/loadingbar = num2loadingbar(timeleft/charge_time)

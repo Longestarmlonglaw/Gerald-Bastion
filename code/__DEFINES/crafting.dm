@@ -84,3 +84,12 @@
 #define CAT_GUNPARTS "Gunparts"
 #define CAT_LIMBS "Limbs"
 #define CAT_ORGANS "Organs"
+// Blood Brother crafting categories, if you see any of these outside of the blood brother crafting component or menu, please yell at me
+#define CAT_BB_WEAPONS "Weapons"
+#define CAT_BB_AMMUNITION "Ammunition"
+#define CAT_BB_GADGETS "Gadgets & Tools"
+#define CAT_BB_ARMOR "Armor"
+#define CAT_BB_EXPLOSIVES "Explosives"
+#define CAT_BB_PARTS "Parts"
+#define CAT_BB_IMPLANTS "Implants"
+#define CAT_BB_SUPPORT "Support"

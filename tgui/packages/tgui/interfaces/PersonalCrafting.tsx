@@ -65,6 +65,14 @@ const CATEGORY_ICONS_CRAFTING = {
   Tools: 'screwdriver-wrench',
   Entertainment: 'masks-theater',
   'Blood Cult': 'users',
+  Weapons: 'gun',
+  Ammunition: 'crosshairs',
+  'Gadgets & Tools': 'screwdriver-wrench',
+  Armor: 'shield-alt',
+  Explosives: 'bomb',
+  Parts: 'cogs',
+  Implants: 'microchip',
+  Support: 'hands-helping',
 } as const;
 
 const CATEGORY_ICONS_COOKING = {
@@ -182,6 +190,17 @@ interface RecipeContentProps {
 }
 
 export const PersonalCrafting = (props) => {
+  return (
+    <Window width={700} height={720}>
+      <Window.Content>
+        <PersonalCraftingContent />
+      </Window.Content>
+    </Window>
+  );
+};
+
+/** The crafting menu itself, without a window, so other interfaces can embed it. */
+export const PersonalCraftingContent = (props) => {
   const { act, data } = useBackend<Data>();
   const {
     mode,
@@ -189,13 +208,22 @@ export const PersonalCrafting = (props) => {
     forced_mode,
     display_compact,
     display_craftable_only,
-    craftability,
+    craftability = {},
     diet,
   } = data;
   const [searchText, setSearchText] = useLocalState('searchText', '');
   const [pages, setPages] = useLocalState('pages', 1);
-  const DEFAULT_CAT_CRAFTING = Object.keys(CATEGORY_ICONS_CRAFTING)[1];
-  const DEFAULT_CAT_COOKING = Object.keys(CATEGORY_ICONS_COOKING)[1];
+  // Fall back to the first available category for menus that don't have the usual default categories.
+  const getDefaultCategory = (preferred: string) =>
+    data.categories.includes(preferred)
+      ? preferred
+      : [...data.categories].sort()[0];
+  const DEFAULT_CAT_CRAFTING = getDefaultCategory(
+    Object.keys(CATEGORY_ICONS_CRAFTING)[1],
+  );
+  const DEFAULT_CAT_COOKING = getDefaultCategory(
+    Object.keys(CATEGORY_ICONS_COOKING)[1],
+  );
   const [activeCategory, setCategory] = useLocalState<string>(
     'category',
     Object.keys(craftability).length
@@ -210,10 +238,10 @@ export const PersonalCrafting = (props) => {
   );
   const material_occurences = flow([
     sortBy<Material>((material) => -material.occurences),
-  ])(data.material_occurences);
+  ])(data.material_occurences || []);
   const [activeMaterial, setMaterial] = useLocalState(
     'material',
-    material_occurences[0].atom_id,
+    material_occurences[0]?.atom_id,
   );
   const [tabMode, setTabMode] = useLocalState('tabMode', 0);
   const visibleMaterials =
@@ -278,318 +306,310 @@ export const PersonalCrafting = (props) => {
   const CATEGORY_ICONS =
     mode === MODE.cooking ? CATEGORY_ICONS_COOKING : CATEGORY_ICONS_CRAFTING;
   return (
-    <Window width={700} height={720}>
-      <Window.Content>
-        <Stack fill>
-          <Stack.Item width={'200px'}>
-            <Section fill>
-              <Stack fill vertical justify={'space-between'}>
-                <Stack.Item>
-                  <Input
-                    autoFocus
-                    placeholder={
-                      'Search in ' +
-                      data.recipes.length +
-                      (mode === MODE.cooking ? ' recipes...' : ' designs...')
+    <Stack fill>
+      <Stack.Item width={'200px'}>
+        <Section fill>
+          <Stack fill vertical justify={'space-between'}>
+            <Stack.Item>
+              <Input
+                autoFocus
+                placeholder={
+                  'Search in ' +
+                  data.recipes.length +
+                  (mode === MODE.cooking ? ' recipes...' : ' designs...')
+                }
+                value={searchText}
+                onChange={(value) => {
+                  setPages(1);
+                  setSearchText(value);
+                }}
+                fluid
+              />
+            </Stack.Item>
+            <Stack.Item>
+              <Tabs fluid textAlign="center">
+                <Tabs.Tab
+                  selected={tabMode === TABS.category}
+                  onClick={() => {
+                    if (tabMode === TABS.category) {
+                      return;
                     }
-                    value={searchText}
-                    onChange={(value) => {
+                    setTabMode(TABS.category);
+                    setPages(1);
+                    setCategory(
+                      Object.keys(craftability).length
+                        ? 'Can Make'
+                        : data.categories[0],
+                    );
+                  }}
+                >
+                  Category
+                </Tabs.Tab>
+                {mode === MODE.cooking && (
+                  <Tabs.Tab
+                    selected={tabMode === TABS.foodtype}
+                    onClick={() => {
+                      if (tabMode === TABS.foodtype) {
+                        return;
+                      }
+                      setTabMode(TABS.foodtype);
                       setPages(1);
-                      setSearchText(value);
+                      setFoodType(
+                        Object.keys(craftability).length
+                          ? 'Can Make'
+                          : data.foodtypes[0],
+                      );
                     }}
-                    fluid
-                  />
-                </Stack.Item>
-                <Stack.Item>
-                  <Tabs fluid textAlign="center">
-                    <Tabs.Tab
-                      selected={tabMode === TABS.category}
+                  >
+                    Type
+                  </Tabs.Tab>
+                )}
+                <Tabs.Tab
+                  selected={tabMode === TABS.material}
+                  onClick={() => {
+                    if (tabMode === TABS.material) {
+                      return;
+                    }
+                    setTabMode(TABS.material);
+                    setPages(1);
+                    setMaterial(material_occurences[0]?.atom_id);
+                  }}
+                >
+                  {mode === MODE.cooking ? 'Ingredient' : 'Material'}
+                </Tabs.Tab>
+              </Tabs>
+            </Stack.Item>
+            <Stack.Item grow m={-1} style={{ overflowY: 'auto' }}>
+              <Box height={'100%'} p={1}>
+                <Tabs vertical>
+                  {tabMode === TABS.foodtype &&
+                    mode === MODE.cooking &&
+                    foodtypes.map((foodtype) => (
+                      <Tabs.Tab
+                        key={foodtype}
+                        selected={
+                          activeType === foodtype && searchText.length === 0
+                        }
+                        onClick={(e) => {
+                          setFoodType(foodtype);
+                          setPages(1);
+                          if (content) {
+                            content.scrollTop = 0;
+                          }
+                          if (searchText.length > 0) {
+                            setSearchText('');
+                          }
+                        }}
+                      >
+                        <FoodtypeContent
+                          type={foodtype}
+                          diet={diet}
+                          craftableCount={Object.keys(craftability).length}
+                        />
+                      </Tabs.Tab>
+                    ))}
+                  {tabMode === TABS.material &&
+                    visibleMaterials.map((material) => (
+                      <Tabs.Tab
+                        key={material.atom_id}
+                        selected={
+                          activeMaterial === material.atom_id &&
+                          searchText.length === 0
+                        }
+                        onClick={(e) => {
+                          setMaterial(material.atom_id);
+                          setPages(1);
+                          if (content) {
+                            content.scrollTop = 0;
+                          }
+                          if (searchText.length > 0) {
+                            setSearchText('');
+                          }
+                        }}
+                      >
+                        <MaterialContent
+                          atom_id={material.atom_id}
+                          occurences={material.occurences}
+                        />
+                      </Tabs.Tab>
+                    ))}
+                  {tabMode === TABS.category &&
+                    categories.map((category) => (
+                      <Tabs.Tab
+                        key={category}
+                        selected={
+                          activeCategory === category && searchText.length === 0
+                        }
+                        onClick={(e) => {
+                          setCategory(category);
+                          setPages(1);
+                          if (content) {
+                            content.scrollTop = 0;
+                          }
+                          if (searchText.length > 0) {
+                            setSearchText('');
+                          }
+                        }}
+                      >
+                        <Stack>
+                          <Stack.Item width="14px" textAlign="center">
+                            <Icon
+                              color={
+                                category === 'Blood Cult' ? 'red' : 'default'
+                              }
+                              name={CATEGORY_ICONS[category] || 'circle'}
+                            />
+                          </Stack.Item>
+                          <Stack.Item
+                            grow
+                            color={
+                              category === 'Blood Cult' ? 'red' : 'default'
+                            }
+                          >
+                            {category}
+                          </Stack.Item>
+                          {category === 'Can Make' && (
+                            <Stack.Item>
+                              {Object.keys(craftability).length}
+                            </Stack.Item>
+                          )}
+                        </Stack>
+                      </Tabs.Tab>
+                    ))}
+                </Tabs>
+              </Box>
+            </Stack.Item>
+            <Stack.Item>
+              <Divider />
+              <Button.Checkbox
+                fluid
+                color="transparent"
+                checked={display_craftable_only}
+                onClick={() => {
+                  act('toggle_recipes');
+                }}
+                mb="0.2em"
+              >
+                Can make only
+              </Button.Checkbox>
+              <Button.Checkbox
+                fluid
+                color="transparent"
+                checked={display_compact}
+                onClick={() => act('toggle_compact')}
+              >
+                Compact list
+              </Button.Checkbox>
+            </Stack.Item>
+            {!forced_mode && (
+              <Stack.Item>
+                <Stack textAlign="center">
+                  <Stack.Item grow>
+                    <Button.Checkbox
+                      fluid
+                      lineHeight={2}
+                      checked={mode === MODE.crafting}
+                      icon="hammer"
+                      style={{
+                        border:
+                          '2px solid ' +
+                          (mode === MODE.crafting ? '#20b142' : '#333'),
+                      }}
                       onClick={() => {
-                        if (tabMode === TABS.category) {
+                        if (mode === MODE.crafting) {
                           return;
                         }
                         setTabMode(TABS.category);
-                        setPages(1);
-                        setCategory(
-                          Object.keys(craftability).length
-                            ? 'Can Make'
-                            : data.categories[0],
-                        );
+                        setCategory(DEFAULT_CAT_CRAFTING);
+                        act('toggle_mode');
                       }}
                     >
-                      Category
-                    </Tabs.Tab>
-                    {mode === MODE.cooking && (
-                      <Tabs.Tab
-                        selected={tabMode === TABS.foodtype}
-                        onClick={() => {
-                          if (tabMode === TABS.foodtype) {
-                            return;
-                          }
-                          setTabMode(TABS.foodtype);
-                          setPages(1);
-                          setFoodType(
-                            Object.keys(craftability).length
-                              ? 'Can Make'
-                              : data.foodtypes[0],
-                          );
-                        }}
-                      >
-                        Type
-                      </Tabs.Tab>
-                    )}
-                    <Tabs.Tab
-                      selected={tabMode === TABS.material}
+                      Craft
+                    </Button.Checkbox>
+                  </Stack.Item>
+                  <Stack.Item grow>
+                    <Button.Checkbox
+                      fluid
+                      lineHeight={2}
+                      checked={mode === MODE.cooking}
+                      icon="utensils"
+                      style={{
+                        border:
+                          '2px solid ' +
+                          (mode === MODE.cooking ? '#20b142' : '#333'),
+                      }}
                       onClick={() => {
-                        if (tabMode === TABS.material) {
+                        if (mode === MODE.cooking) {
                           return;
                         }
-                        setTabMode(TABS.material);
-                        setPages(1);
-                        setMaterial(material_occurences[0].atom_id);
+                        setTabMode(TABS.category);
+                        setCategory(DEFAULT_CAT_COOKING);
+                        act('toggle_mode');
                       }}
                     >
-                      {mode === MODE.cooking ? 'Ingredient' : 'Material'}
-                    </Tabs.Tab>
-                  </Tabs>
-                </Stack.Item>
-                <Stack.Item grow m={-1} style={{ overflowY: 'auto' }}>
-                  <Box height={'100%'} p={1}>
-                    <Tabs vertical>
-                      {tabMode === TABS.foodtype &&
-                        mode === MODE.cooking &&
-                        foodtypes.map((foodtype) => (
-                          <Tabs.Tab
-                            key={foodtype}
-                            selected={
-                              activeType === foodtype && searchText.length === 0
-                            }
-                            onClick={(e) => {
-                              setFoodType(foodtype);
-                              setPages(1);
-                              if (content) {
-                                content.scrollTop = 0;
-                              }
-                              if (searchText.length > 0) {
-                                setSearchText('');
-                              }
-                            }}
-                          >
-                            <FoodtypeContent
-                              type={foodtype}
-                              diet={diet}
-                              craftableCount={Object.keys(craftability).length}
-                            />
-                          </Tabs.Tab>
-                        ))}
-                      {tabMode === TABS.material &&
-                        visibleMaterials.map((material) => (
-                          <Tabs.Tab
-                            key={material.atom_id}
-                            selected={
-                              activeMaterial === material.atom_id &&
-                              searchText.length === 0
-                            }
-                            onClick={(e) => {
-                              setMaterial(material.atom_id);
-                              setPages(1);
-                              if (content) {
-                                content.scrollTop = 0;
-                              }
-                              if (searchText.length > 0) {
-                                setSearchText('');
-                              }
-                            }}
-                          >
-                            <MaterialContent
-                              atom_id={material.atom_id}
-                              occurences={material.occurences}
-                            />
-                          </Tabs.Tab>
-                        ))}
-                      {tabMode === TABS.category &&
-                        categories.map((category) => (
-                          <Tabs.Tab
-                            key={category}
-                            selected={
-                              activeCategory === category &&
-                              searchText.length === 0
-                            }
-                            onClick={(e) => {
-                              setCategory(category);
-                              setPages(1);
-                              if (content) {
-                                content.scrollTop = 0;
-                              }
-                              if (searchText.length > 0) {
-                                setSearchText('');
-                              }
-                            }}
-                          >
-                            <Stack>
-                              <Stack.Item width="14px" textAlign="center">
-                                <Icon
-                                  color={
-                                    category === 'Blood Cult'
-                                      ? 'red'
-                                      : 'default'
-                                  }
-                                  name={CATEGORY_ICONS[category] || 'circle'}
-                                />
-                              </Stack.Item>
-                              <Stack.Item
-                                grow
-                                color={
-                                  category === 'Blood Cult' ? 'red' : 'default'
-                                }
-                              >
-                                {category}
-                              </Stack.Item>
-                              {category === 'Can Make' && (
-                                <Stack.Item>
-                                  {Object.keys(craftability).length}
-                                </Stack.Item>
-                              )}
-                            </Stack>
-                          </Tabs.Tab>
-                        ))}
-                    </Tabs>
-                  </Box>
-                </Stack.Item>
-                <Stack.Item>
-                  <Divider />
-                  <Button.Checkbox
-                    fluid
-                    color="transparent"
-                    checked={display_craftable_only}
-                    onClick={() => {
-                      act('toggle_recipes');
-                    }}
-                    mb="0.2em"
-                  >
-                    Can make only
-                  </Button.Checkbox>
-                  <Button.Checkbox
-                    fluid
-                    color="transparent"
-                    checked={display_compact}
-                    onClick={() => act('toggle_compact')}
-                  >
-                    Compact list
-                  </Button.Checkbox>
-                </Stack.Item>
-                {!forced_mode && (
-                  <Stack.Item>
-                    <Stack textAlign="center">
-                      <Stack.Item grow>
-                        <Button.Checkbox
-                          fluid
-                          lineHeight={2}
-                          checked={mode === MODE.crafting}
-                          icon="hammer"
-                          style={{
-                            border:
-                              '2px solid ' +
-                              (mode === MODE.crafting ? '#20b142' : '#333'),
-                          }}
-                          onClick={() => {
-                            if (mode === MODE.crafting) {
-                              return;
-                            }
-                            setTabMode(TABS.category);
-                            setCategory(DEFAULT_CAT_CRAFTING);
-                            act('toggle_mode');
-                          }}
-                        >
-                          Craft
-                        </Button.Checkbox>
-                      </Stack.Item>
-                      <Stack.Item grow>
-                        <Button.Checkbox
-                          fluid
-                          lineHeight={2}
-                          checked={mode === MODE.cooking}
-                          icon="utensils"
-                          style={{
-                            border:
-                              '2px solid ' +
-                              (mode === MODE.cooking ? '#20b142' : '#333'),
-                          }}
-                          onClick={() => {
-                            if (mode === MODE.cooking) {
-                              return;
-                            }
-                            setTabMode(TABS.category);
-                            setCategory(DEFAULT_CAT_COOKING);
-                            act('toggle_mode');
-                          }}
-                        >
-                          Cook
-                        </Button.Checkbox>
-                      </Stack.Item>
-                    </Stack>
+                      Cook
+                    </Button.Checkbox>
                   </Stack.Item>
-                )}
-              </Stack>
-            </Section>
-          </Stack.Item>
-          <Stack.Item grow my={-1}>
-            <Box
-              id="content"
-              height={'100%'}
-              pr={1}
-              pt={1}
-              mr={-1}
-              style={{ overflowY: 'auto' }}
+                </Stack>
+              </Stack.Item>
+            )}
+          </Stack>
+        </Section>
+      </Stack.Item>
+      <Stack.Item grow my={-1}>
+        <Box
+          id="content"
+          height={'100%'}
+          pr={1}
+          pt={1}
+          mr={-1}
+          style={{ overflowY: 'auto' }}
+        >
+          {recipes.length > 0 ? (
+            recipes
+              .slice(0, displayLimit)
+              .map((item) =>
+                display_compact ? (
+                  <RecipeContentCompact
+                    key={item.ref}
+                    item={item}
+                    craftable={
+                      !item.non_craftable && Boolean(craftability[item.ref])
+                    }
+                    busy={busy}
+                    mode={mode}
+                  />
+                ) : (
+                  <RecipeContent
+                    key={item.ref}
+                    item={item}
+                    craftable={
+                      !item.non_craftable && Boolean(craftability[item.ref])
+                    }
+                    busy={busy}
+                    mode={mode}
+                    diet={diet}
+                  />
+                ),
+              )
+          ) : (
+            <NoticeBox m={1} p={1}>
+              No recipes found.
+            </NoticeBox>
+          )}
+          {recipes.length > displayLimit && (
+            <Section
+              mb={2}
+              textAlign="center"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setPages(pages + 1)}
             >
-              {recipes.length > 0 ? (
-                recipes
-                  .slice(0, displayLimit)
-                  .map((item) =>
-                    display_compact ? (
-                      <RecipeContentCompact
-                        key={item.ref}
-                        item={item}
-                        craftable={
-                          !item.non_craftable && Boolean(craftability[item.ref])
-                        }
-                        busy={busy}
-                        mode={mode}
-                      />
-                    ) : (
-                      <RecipeContent
-                        key={item.ref}
-                        item={item}
-                        craftable={
-                          !item.non_craftable && Boolean(craftability[item.ref])
-                        }
-                        busy={busy}
-                        mode={mode}
-                        diet={diet}
-                      />
-                    ),
-                  )
-              ) : (
-                <NoticeBox m={1} p={1}>
-                  No recipes found.
-                </NoticeBox>
-              )}
-              {recipes.length > displayLimit && (
-                <Section
-                  mb={2}
-                  textAlign="center"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setPages(pages + 1)}
-                >
-                  Load {Math.min(pageSize, recipes.length - displayLimit)}{' '}
-                  more...
-                </Section>
-              )}
-            </Box>
-          </Stack.Item>
-        </Stack>
-      </Window.Content>
-    </Window>
+              Load {Math.min(pageSize, recipes.length - displayLimit)} more...
+            </Section>
+          )}
+        </Box>
+      </Stack.Item>
+    </Stack>
   );
 };
 
