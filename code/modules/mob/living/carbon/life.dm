@@ -497,6 +497,9 @@
 	var/obj/item/organ/internal/heart/heart = get_organ_slot(ORGAN_SLOT_HEART)
 	if(!heart || IS_ROBOTIC_ORGAN(heart))
 		return FALSE
+	// Nothing can stop an immune heart, but one that is too damaged to work stops on its own like any other
+	if(HAS_TRAIT(src, TRAIT_HEART_ATTACK_IMMUNE) && !(heart.organ_flags & ORGAN_FAILING))
+		return FALSE
 	return TRUE
 
 /mob/living/carbon/proc/needs_heart()

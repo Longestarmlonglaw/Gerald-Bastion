@@ -29,6 +29,8 @@
 #define ROLE_DARKSPAWN_WARLOCK "Warlock"
 #define ROLE_DARKSPAWN_SCOUT "Scout"
 #define ROLE_SPY "Spy"
+#define ROLE_ARCFIEND "Arcfiend"
+#define ROLE_ARCFIEND_MIDROUND "Arcfiend (Midround)"
 
 // Midround roles
 #define ROLE_ABDUCTOR "Abductor"
@@ -169,6 +171,7 @@ GLOBAL_LIST_INIT(special_roles, list(
 	ROLE_BLOODLING = 15,
 	ROLE_DARKSPAWN = 14,
 	ROLE_SPY = 0,
+	ROLE_ARCFIEND = 14,
 
 	// Midround
 	ROLE_ABDUCTOR = 0,
@@ -189,6 +192,7 @@ GLOBAL_LIST_INIT(special_roles, list(
 	ROLE_PARADOX_CLONE = 0,
 	ROLE_REVENANT = 0,
 	ROLE_SLEEPER_AGENT = 0,
+	ROLE_ARCFIEND_MIDROUND = 14,
 	ROLE_SPACE_DRAGON = 0,
 	ROLE_SPIDER = 0,
 	ROLE_WIZARD_MIDROUND = 14,

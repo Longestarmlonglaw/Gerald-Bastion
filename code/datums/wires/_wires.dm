@@ -261,6 +261,10 @@
 	if(isAdminGhostAI(user))
 		return TRUE
 
+	// Anyone who knows every kind of wire. The wire types that have their own checks all fall back to this one.
+	if(HAS_TRAIT(user, TRAIT_KNOW_ALL_WIRES))
+		return TRUE
+
 	// Same for anyone with an abductor multitool.
 	if(user.is_holding_item_of_type(/obj/item/multitool/abductor))
 		return TRUE

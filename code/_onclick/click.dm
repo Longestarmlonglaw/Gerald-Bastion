@@ -10,6 +10,8 @@
 // THESE DO NOT EFFECT THE BASE 1 DECISECOND DELAY OF NEXT_CLICK
 /mob/var/next_move_adjust = 0 //Amount to adjust action/click delays by, + or -
 /mob/var/next_move_modifier = 1 //Value to multiply action/click delays by
+/// Value to multiply the delay between shots by, for the guns this mob fires. Under 1 is faster. Only matters for guns that have a delay of their own.
+/mob/var/gun_fire_delay_modifier = 1
 
 
 //Delays the mob's next click/action by num deciseconds

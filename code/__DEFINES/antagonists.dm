@@ -494,6 +494,10 @@ GLOBAL_LIST_INIT(human_invader_antagonists, list(
 /// Checks if the given mob is a Bingle
 #define IS_BINGLE(mob) (mob?.mind?.has_antag_datum(/datum/antagonist/bingle))
 
+#define IS_ARCFIEND(A) (A?.mind?.has_antag_datum(/datum/antagonist/arcfiend))
+/// Trait source for everything the arcfiend antag datum grants
+#define ARCFIEND_TRAIT "arcfiend_trait"
+
 #define IS_DARKSPAWN(A) (A?.mind?.has_antag_datum(/datum/antagonist/darkspawn))
 #define IS_THRALL(A) (A?.mind?.has_antag_datum(/datum/antagonist/thrall_darkspawn))
 ///non thrall teammates
