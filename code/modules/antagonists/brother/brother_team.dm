@@ -97,9 +97,9 @@
 		forge_single_objective()
 	if(is_hijacker)
 		if(!locate(/datum/objective/hijack) in objectives)
-			add_objective(new /datum/objective/hijack/brother)
+			add_objective(new /datum/objective/hijack)
 	else if(!locate(/datum/objective/escape) in objectives)
-		add_objective(new /datum/objective/escape/brother)
+		add_objective(new /datum/objective/escape)
 
 	for(var/datum/mind/brother as anything in members)
 		var/datum/antagonist/brother/blood_bond = brother.has_antag_datum(/datum/antagonist/brother)
@@ -125,34 +125,6 @@
 
 /datum/objective/convert_brother/check_completion()
 	return length(team?.members) > 1
-
-/// After some heavy thinking, im making it so only one brother has to escape.
-/datum/objective/escape/brother
-	name = "blood brother escape"
-	explanation_text = "Have at least one member of your team escape on the shuttle or an escape pod alive and without being in custody."
-	team_explanation_text = "Have at least one member of your team escape on the shuttle or an escape pod alive and without being in custody."
-	admin_grantable = TRUE
-
-/datum/objective/escape/brother/check_completion()
-	for(var/datum/mind/brother as anything in get_owners())
-		if(considered_escaped(brother))
-			return TRUE
-	return FALSE
-
-/// Same as escape, only one brother has to be alive on the hijacked shuttle. Not gonna post my entire phliosophy on this in code comments, but trust me.
-/datum/objective/hijack/brother
-	name = "blood brother hijack"
-	explanation_text = "Hijack the emergency shuttle by hacking its navigational protocols through the control console (alt click emergency shuttle console). At least one member of your team must be alive on board."
-	team_explanation_text = "Hijack the emergency shuttle by hacking its navigational protocols through the control console (alt click emergency shuttle console). At least one member of your team must be alive on board."
-	admin_grantable = TRUE
-
-/datum/objective/hijack/brother/check_completion()
-	if(SSshuttle.emergency.mode != SHUTTLE_ENDGAME)
-		return FALSE
-	for(var/datum/mind/brother as anything in get_owners())
-		if(considered_alive(brother) && SSshuttle.emergency.shuttle_areas[get_area(brother.current)])
-			return SSshuttle.emergency.is_hijacked()
-	return FALSE
 
 /datum/team/brother_team/proc/roll_for_color()
 	if(!isnull(color) || !length(members))

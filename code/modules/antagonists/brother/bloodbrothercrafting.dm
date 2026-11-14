@@ -965,21 +965,3 @@
 		TOOL_WIRECUTTER,
 	)
 	time = 8 SECONDS
-
-/datum/crafting_recipe/blood_brother/syndicate_encryption_key
-	name = "Syndicate Encryption Key"
-	desc = "Not too useful since you can already chat with your brothers without this, but being able to talk with other enemies of Nanotrasen is convenient."
-	category = CAT_BB_GADGETS
-	result = /obj/item/encryptionkey/syndicate
-	reqs = list(
-		/obj/item/encryptionkey = 1,
-		/obj/item/stock_parts/subspace/crystal = 1,
-		/obj/item/stock_parts/subspace/transmitter = 1,
-		/obj/item/stack/cable_coil = 5,
-	)
-	blacklist = list(/obj/item/encryptionkey/syndicate)
-	tool_behaviors = list(
-		TOOL_SCREWDRIVER,
-		TOOL_MULTITOOL,
-	)
-	time = 5 SECONDS
